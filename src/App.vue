@@ -1,11 +1,4 @@
 <template>
-  <h1>안녕하세요</h1>
-</template>
-
-<script setup>
-</script>
-
-<!-- <template>
   <div>{{ items[0]?.value }}</div>
 
   <ImageBlock
@@ -25,4 +18,4 @@ const items = ref([]);
 onMounted(async () => {
   items.value = await getPageData();
 });
-</script> -->
+</script>
