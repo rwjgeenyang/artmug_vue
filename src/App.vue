@@ -10,8 +10,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { getPageData } from "../services/sheetApi";
-import ImageBlock from "./components/ImageBlock.vue";
+import { getPageData } from "./services/sheetApi";
+import ImageBlock from "./components/imageBlock.vue";
 
 const items = ref([]);
 
