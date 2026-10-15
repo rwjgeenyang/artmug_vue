@@ -8,5 +8,12 @@ export async function getPageData() {
     throw new Error("데이터를 불러오지 못했습니다.");
   }
 
-  return await response.json();
+  const payload = await response.json();
+  const items = Array.isArray(payload) ? payload : payload?.data;
+
+  if (!Array.isArray(items)) {
+    throw new Error("구글 시트 응답 형식이 올바르지 않습니다.");
+  }
+
+  return items;
 }
