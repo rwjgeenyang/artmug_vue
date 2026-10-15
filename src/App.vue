@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { getPageData } from "./services/sheetApi";
+import MediaCarousel from "./components/MediaCarousel.vue";
 
 const items = ref([]);
 const loading = ref(true);
@@ -34,6 +35,27 @@ const videos = computed(() => items.value
   .filter(item => item?.type === "youtube")
   .map(item => youtubeEmbed(item.value)).filter(Boolean));
 
+// Mouse-drag the page background; touch users keep native vertical scrolling.
+const pageDragging = ref(false);
+let pageGesture = null;
+function pageDown(event) {
+  if (event.pointerType !== "mouse" || event.button !== 0 || event.target.closest(".carousel, button, a, input, textarea")) return;
+  pageGesture = { id: event.pointerId, y: event.clientY, scroll: window.scrollY };
+  event.currentTarget.setPointerCapture(event.pointerId);
+  event.preventDefault();
+}
+function pageMove(event) {
+  if (!pageGesture || pageGesture.id !== event.pointerId) return;
+  const delta = event.clientY - pageGesture.y;
+  if (Math.abs(delta) > 5) pageDragging.value = true;
+  if (pageDragging.value) window.scrollTo({ top: pageGesture.scroll - delta, behavior: "instant" });
+}
+function pageUp(event) {
+  pageGesture = null;
+  pageDragging.value = false;
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+}
+
 async function load() {
   loading.value = true;
   error.value = "";
@@ -45,7 +67,7 @@ onMounted(load);
 </script>
 
 <template>
-  <main class="page">
+  <main class="page" :class="{ 'page-dragging': pageDragging }" @pointerdown="pageDown" @pointermove="pageMove" @pointerup="pageUp" @pointercancel="pageUp" @lostpointercapture="pageUp">
     <p v-if="loading" class="status" role="status">내용을 불러오는 중입니다…</p>
     <div v-if="error" class="status" role="alert">
       {{ error }} <button type="button" @click="load">다시 불러오기</button>
@@ -65,26 +87,12 @@ onMounted(load);
 
     <section class="section" aria-labelledby="gif-heading">
       <header class="section-heading"><span class="number">02</span><h2 id="gif-heading">GIF</h2></header>
-      <div class="media-grid">
-        <figure v-for="(url, index) in gifs" :key="url + index" class="media-card">
-          <img :src="url" :alt="'애니메이션 작업물 ' + (index + 1)" loading="lazy" />
-        </figure>
-        <template v-if="!gifs.length">
-          <div v-for="slot in 2" :key="slot" class="placeholder"><strong>GIF {{ String(slot).padStart(2, "0") }}</strong><span>애니메이션이 들어갈 공간</span></div>
-        </template>
-      </div>
+      <MediaCarousel :urls="gifs" kind="gif" label="GIF" />
     </section>
 
     <section class="section" aria-labelledby="youtube-heading">
       <header class="section-heading"><span class="number">03</span><h2 id="youtube-heading">작업물 <small>YouTube</small></h2></header>
-      <div class="media-grid">
-        <div v-for="(url, index) in videos" :key="url + index" class="video-card">
-          <iframe :src="url" :title="'유튜브 작업물 ' + (index + 1)" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-        </div>
-        <template v-if="!videos.length">
-          <div v-for="slot in 2" :key="slot" class="placeholder video-placeholder"><span class="play" aria-hidden="true">▷</span><strong>작업물 {{ String(slot).padStart(2, "0") }}</strong><span>유튜브 영상이 들어갈 공간</span></div>
-        </template>
-      </div>
+      <MediaCarousel :urls="videos" kind="youtube" label="작업물" />
     </section>
   </main>
 </template>
