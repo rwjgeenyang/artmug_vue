@@ -1,6 +1,7 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onBeforeUnmount, ref } from "vue";
 import { getPageData } from "./services/sheetApi";
+import { connectEmbedHeight } from "./services/embedHeight";
 import MediaCarousel from "./components/MediaCarousel.vue";
 
 const items = ref([]);
@@ -35,26 +36,10 @@ const videos = computed(() => items.value
   .filter(item => item?.type === "youtube")
   .map(item => youtubeEmbed(item.value)).filter(Boolean));
 
-// Mouse-drag the page background; touch users keep native vertical scrolling.
-const pageDragging = ref(false);
-let pageGesture = null;
-function pageDown(event) {
-  if (event.pointerType !== "mouse" || event.button !== 0 || event.target.closest(".carousel, button, a, input, textarea")) return;
-  pageGesture = { id: event.pointerId, y: event.clientY, scroll: window.scrollY };
-  event.currentTarget.setPointerCapture(event.pointerId);
-  event.preventDefault();
-}
-function pageMove(event) {
-  if (!pageGesture || pageGesture.id !== event.pointerId) return;
-  const delta = event.clientY - pageGesture.y;
-  if (Math.abs(delta) > 5) pageDragging.value = true;
-  if (pageDragging.value) window.scrollTo({ top: pageGesture.scroll - delta, behavior: "instant" });
-}
-function pageUp(event) {
-  pageGesture = null;
-  pageDragging.value = false;
-  if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-}
+const pageElement = ref(null);
+let disconnectEmbed = () => {};
+onMounted(() => { disconnectEmbed = connectEmbedHeight(pageElement.value); });
+onBeforeUnmount(() => disconnectEmbed());
 
 async function load() {
   loading.value = true;
@@ -67,7 +52,7 @@ onMounted(load);
 </script>
 
 <template>
-  <main class="page" :class="{ 'page-dragging': pageDragging }" @pointerdown="pageDown" @pointermove="pageMove" @pointerup="pageUp" @pointercancel="pageUp" @lostpointercapture="pageUp">
+  <main class="page" ref="pageElement">
     <p v-if="loading" class="status" role="status">내용을 불러오는 중입니다…</p>
     <div v-if="error" class="status" role="alert">
       {{ error }} <button type="button" @click="load">다시 불러오기</button>
@@ -96,3 +81,7 @@ onMounted(load);
     </section>
   </main>
 </template>
+
+<style>
+html.artmug-auto-height, html.artmug-auto-height body { overflow: hidden; }
+</style>
