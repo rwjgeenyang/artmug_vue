@@ -70,7 +70,6 @@ function keyboard(event) {
           <div v-else class="empty-copy"><span class="empty-symbol">{{ kind === 'gif' ? 'GIF' : '▷' }}</span><strong>{{ label }} {{ String(index + 1).padStart(2, '0') }}</strong><span>{{ kind === 'gif' ? '애니메이션이 들어갈 공간' : '유튜브 영상이 들어갈 공간' }}</span></div>
         </div>
       </div>
-      <div class="drag-strip"><span aria-hidden="true">↔</span> {{ kind === 'youtube' && current ? '이곳을 드래그하면 다른 영상으로 이동해요' : '좌우로 드래그해서 넘겨보세요' }}</div>
     </div>
   </div>
 </template>
