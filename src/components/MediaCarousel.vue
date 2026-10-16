@@ -82,13 +82,14 @@ function keyboard(event) {
 .counter-text { font-size: 12px; margin-right: 8px; font-variant-numeric: tabular-nums; }
 .carousel-controls button { width: 36px; height: 36px; border-radius: 50%; margin: 0; padding: 0; font-size: 18px; }
 button:disabled { opacity: .3; cursor: default; }
-.carousel-surface { overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
+.carousel-surface { border-radius: 0 0 17px 17px; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
 .carousel-surface.dragging { cursor: grabbing; }
 .carousel-content { transition: transform .25s ease; }
 .dragging .carousel-content { transition: none; }
 .carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #f5f6f8; overflow: hidden; }
 .gif-media { aspect-ratio: 16 / 10; }
-.carousel-media img { display: block; width: 100%; height: 100%; object-fit: contain; position: absolute; inset: 0; pointer-events: none; }
+/* Keep GIFs at their intrinsic size; shrink only when the card is smaller. */
+.carousel-media img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; inset: 0; margin: auto; border-radius: 0 0 16px 16px; pointer-events: none; }
 .carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
 .empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #969da8; }
 .empty-copy strong { color: #747d8b; font-size: 15px; font-weight: 500; }
