@@ -51,14 +51,6 @@ function keyboard(event) {
 
 <template>
   <div class="carousel" role="region" aria-roledescription="슬라이더" :aria-label="label" tabindex="0" @keydown="keyboard">
-    <div class="carousel-top">
-      <span>{{ label }}</span>
-      <div class="carousel-controls">
-        <span class="counter-text" aria-live="polite">{{ index + 1 }} / {{ slides.length }}</span>
-        <button type="button" :disabled="index === 0" :aria-label="label + ' 이전'" @click="move(-1)">←</button>
-        <button type="button" :disabled="index === slides.length - 1" :aria-label="label + ' 다음'" @click="move(1)">→</button>
-      </div>
-    </div>
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
         <div class="carousel-media" :class="{ 'gif-media': kind === 'gif', 'gif-filled': kind === 'gif' && current && !failed }">
@@ -71,30 +63,32 @@ function keyboard(event) {
         </div>
       </div>
     </div>
+    <div class="carousel-controls" :aria-label="label + ' 탐색'">
+      <button type="button" :disabled="index === 0" :aria-label="label + ' 이전'" @click="move(-1)">←</button>
+      <span class="counter-text" aria-live="polite">{{ index + 1 }} / {{ slides.length }}</span>
+      <button type="button" :disabled="index === slides.length - 1" :aria-label="label + ' 다음'" @click="move(1)">→</button>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.carousel { border: 1px solid #e3e5e9; border-radius: 18px; overflow: hidden; background: white; box-shadow: 0 6px 24px #252b3510; }
+.carousel { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 .carousel:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }
-.carousel-top { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; font-size: 13px; color: #6e7580; }
-.carousel-controls { display: flex; align-items: center; gap: 8px; }
-.counter-text { font-size: 12px; margin-right: 8px; font-variant-numeric: tabular-nums; }
+.carousel-controls { align-self: center; display: flex; align-items: center; gap: 16px; padding: 8px 12px; border: 1px solid #512b33; border-radius: 16px; background: linear-gradient(135deg, #171316, #30171e); box-shadow: 0 6px 24px #0003; }
+.counter-text { font-size: 12px; min-width: 42px; text-align: center; color: #e5cbd1; font-variant-numeric: tabular-nums; }
 .carousel-controls button { width: 36px; height: 36px; border-radius: 50%; margin: 0; padding: 0; font-size: 18px; }
 button:disabled { opacity: .3; cursor: default; }
-.carousel-surface { border-radius: 0 0 17px 17px; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
+.carousel-surface { border-radius: 18px; box-shadow: 0 6px 24px #0003; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
 .carousel-surface.dragging { cursor: grabbing; }
 .carousel-content { transition: transform .25s ease; }
 .dragging .carousel-content { transition: none; }
-.carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #f5f6f8; overflow: hidden; }
+.carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #201419; overflow: hidden; }
 .gif-media { aspect-ratio: 16 / 10; }
 .gif-media.gif-filled { aspect-ratio: auto; display: block; }
-.carousel-media img { display: block; width: 100%; height: auto; border-radius: 0 0 16px 16px; pointer-events: none; }
+.carousel-media img { display: block; width: 100%; height: auto; border-radius: 18px; pointer-events: none; }
 .carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
-.empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #969da8; }
-.empty-copy strong { color: #747d8b; font-size: 15px; font-weight: 500; }
+.empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #c2a4ac; }
+.empty-copy strong { color: #edd8dd; font-size: 15px; font-weight: 500; }
 .empty-symbol { font-size: 28px; letter-spacing: .1em; color: #b8bdc6; }
-.drag-strip { min-height: 54px; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; font-size: 12px; color: #939aa5; background: white; }
 @media (prefers-reduced-motion: reduce) { .carousel-content { transition: none; } }
-@media (max-width: 560px) { .carousel-top { padding: 12px 14px; } .drag-strip { font-size: 11px; } }
 </style>
