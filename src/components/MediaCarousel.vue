@@ -64,7 +64,7 @@ function keyboard(event) {
         <div class="carousel-media" :class="{ 'gif-media': kind === 'gif' }">
           <template v-if="current">
             <img v-if="kind === 'gif' && !failed" :key="current" :src="current" :alt="label + ' ' + (index + 1)" draggable="false" @error="failed = true" />
-            <iframe v-else-if="kind === 'youtube'" :key="current" :src="current" :title="label + ' ' + (index + 1)" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            <iframe v-else-if="kind === 'youtube'" :src="current" :title="label + ' ' + (index + 1)" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
             <p v-else class="empty-copy">이미지를 불러오지 못했습니다.</p>
           </template>
           <div v-else class="empty-copy"><span class="empty-symbol">{{ kind === 'gif' ? 'GIF' : '▷' }}</span><strong>{{ label }} {{ String(index + 1).padStart(2, '0') }}</strong><span>{{ kind === 'gif' ? '애니메이션이 들어갈 공간' : '유튜브 영상이 들어갈 공간' }}</span></div>
