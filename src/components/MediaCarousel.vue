@@ -6,19 +6,13 @@ const slides = computed(() => props.urls.length ? props.urls : ['', '']);
 const index = ref(0);
 const offset = ref(0);
 const dragging = ref(false);
-const playing = ref(false);
 const failed = ref(false);
 let gesture = null;
-watch(() => props.urls, () => { index.value = 0; playing.value = false; failed.value = false; });
+watch(() => props.urls, () => { index.value = 0; failed.value = false; });
 const current = computed(() => slides.value[index.value]);
-const thumbnail = computed(() => {
-  if (!current.value) return '';
-  const id = current.value.split('/').pop().split('?')[0];
-  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-});
 function move(direction) {
   const next = Math.max(0, Math.min(slides.value.length - 1, index.value + direction));
-  if (next !== index.value) { playing.value = false; failed.value = false; }
+  if (next !== index.value) { failed.value = false; }
   index.value = next;
   offset.value = 0;
 }
@@ -70,17 +64,13 @@ function keyboard(event) {
         <div class="carousel-media" :class="{ 'gif-media': kind === 'gif' }">
           <template v-if="current">
             <img v-if="kind === 'gif' && !failed" :key="current" :src="current" :alt="label + ' ' + (index + 1)" draggable="false" @error="failed = true" />
-            <iframe v-else-if="kind === 'youtube' && playing" :key="current" :src="current + '?autoplay=1'" :title="label + ' ' + (index + 1)" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            <template v-else-if="kind === 'youtube'">
-              <img v-if="!failed" :key="thumbnail" :src="thumbnail" alt="" draggable="false" @error="failed = true" />
-              <button type="button" class="play-button" :aria-label="label + ' ' + (index + 1) + ' 재생'" @pointerdown.stop @click="playing = true">▶</button>
-            </template>
+            <iframe v-else-if="kind === 'youtube'" :key="current" :src="current" :title="label + ' ' + (index + 1)" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
             <p v-else class="empty-copy">이미지를 불러오지 못했습니다.</p>
           </template>
           <div v-else class="empty-copy"><span class="empty-symbol">{{ kind === 'gif' ? 'GIF' : '▷' }}</span><strong>{{ label }} {{ String(index + 1).padStart(2, '0') }}</strong><span>{{ kind === 'gif' ? '애니메이션이 들어갈 공간' : '유튜브 영상이 들어갈 공간' }}</span></div>
         </div>
       </div>
-      <div class="drag-strip"><span aria-hidden="true">↔</span> {{ playing ? '이곳을 드래그하면 다른 영상으로 이동해요' : '좌우로 드래그해서 넘겨보세요' }}<button v-if="playing" type="button" @pointerdown.stop @click="playing = false">영상 닫기</button></div>
+      <div class="drag-strip"><span aria-hidden="true">↔</span> {{ kind === 'youtube' && current ? '이곳을 드래그하면 다른 영상으로 이동해요' : '좌우로 드래그해서 넘겨보세요' }}</div>
     </div>
   </div>
 </template>
@@ -101,12 +91,10 @@ button:disabled { opacity: .3; cursor: default; }
 .gif-media { aspect-ratio: 16 / 10; }
 .carousel-media img { display: block; width: 100%; height: 100%; object-fit: contain; position: absolute; inset: 0; pointer-events: none; }
 .carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
-.play-button { position: absolute; width: 64px; height: 48px; margin: 0; border: none; border-radius: 14px; background: #292d35e8; color: white; font-size: 20px; }
 .empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #969da8; }
 .empty-copy strong { color: #747d8b; font-size: 15px; font-weight: 500; }
 .empty-symbol { font-size: 28px; letter-spacing: .1em; color: #b8bdc6; }
 .drag-strip { min-height: 54px; padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; font-size: 12px; color: #939aa5; background: white; }
-.drag-strip button { font-size: 11px; }
 @media (prefers-reduced-motion: reduce) { .carousel-content { transition: none; } }
 @media (max-width: 560px) { .carousel-top { padding: 12px 14px; } .drag-strip { font-size: 11px; } }
 </style>
