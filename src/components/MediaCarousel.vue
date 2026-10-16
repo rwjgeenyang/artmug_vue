@@ -74,21 +74,21 @@ function keyboard(event) {
 <style scoped>
 .carousel { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 .carousel:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }
-.carousel-controls { align-self: center; display: flex; align-items: center; gap: 16px; padding: 8px 12px; border: 1px solid #512b33; border-radius: 16px; background: linear-gradient(135deg, #171316, #30171e); box-shadow: 0 6px 24px #0003; }
-.counter-text { font-size: 12px; min-width: 42px; text-align: center; color: #e5cbd1; font-variant-numeric: tabular-nums; }
+.carousel-controls { align-self: center; display: flex; align-items: center; gap: 16px; padding: 8px 12px; border: 1px solid #e9dfe3; border-radius: 16px; background: #faf6f7; box-shadow: 0 4px 16px #39202b0a; }
+.counter-text { font-size: 12px; min-width: 42px; text-align: center; color: #74636b; font-variant-numeric: tabular-nums; }
 .carousel-controls button { width: 36px; height: 36px; border-radius: 50%; margin: 0; padding: 0; font-size: 18px; }
 button:disabled { opacity: .3; cursor: default; }
-.carousel-surface { border-radius: 18px; box-shadow: 0 6px 24px #0003; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
+.carousel-surface { border-radius: 18px; box-shadow: 0 6px 24px #252b3510; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
 .carousel-surface.dragging { cursor: grabbing; }
 .carousel-content { transition: transform .25s ease; }
 .dragging .carousel-content { transition: none; }
-.carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #201419; overflow: hidden; }
+.carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #f5f6f8; overflow: hidden; }
 .gif-media { aspect-ratio: 16 / 10; }
 .gif-media.gif-filled { aspect-ratio: auto; display: block; }
 .carousel-media img { display: block; width: 100%; height: auto; border-radius: 18px; pointer-events: none; }
 .carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
-.empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #c2a4ac; }
-.empty-copy strong { color: #edd8dd; font-size: 15px; font-weight: 500; }
+.empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #77717a; }
+.empty-copy strong { color: #57515a; font-size: 15px; font-weight: 500; }
 .empty-symbol { font-size: 28px; letter-spacing: .1em; color: #b8bdc6; }
 @media (prefers-reduced-motion: reduce) { .carousel-content { transition: none; } }
 </style>
