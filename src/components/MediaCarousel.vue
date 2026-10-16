@@ -61,7 +61,7 @@ function keyboard(event) {
     </div>
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
-        <div class="carousel-media" :class="{ 'gif-media': kind === 'gif' }">
+        <div class="carousel-media" :class="{ 'gif-media': kind === 'gif', 'gif-filled': kind === 'gif' && current && !failed }">
           <template v-if="current">
             <img v-if="kind === 'gif' && !failed" :key="current" :src="current" :alt="label + ' ' + (index + 1)" draggable="false" @error="failed = true" />
             <iframe v-else-if="kind === 'youtube'" :src="current" :title="label + ' ' + (index + 1)" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
@@ -88,7 +88,8 @@ button:disabled { opacity: .3; cursor: default; }
 .dragging .carousel-content { transition: none; }
 .carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #f5f6f8; overflow: hidden; }
 .gif-media { aspect-ratio: 16 / 10; }
-.carousel-media img { display: block; width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; border-radius: 0 0 16px 16px; pointer-events: none; }
+.gif-media.gif-filled { aspect-ratio: auto; display: block; }
+.carousel-media img { display: block; width: 100%; height: auto; border-radius: 0 0 16px 16px; pointer-events: none; }
 .carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
 .empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #969da8; }
 .empty-copy strong { color: #747d8b; font-size: 15px; font-weight: 500; }
