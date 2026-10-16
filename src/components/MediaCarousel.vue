@@ -88,8 +88,7 @@ button:disabled { opacity: .3; cursor: default; }
 .dragging .carousel-content { transition: none; }
 .carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #f5f6f8; overflow: hidden; }
 .gif-media { aspect-ratio: 16 / 10; }
-/* Keep GIFs at their intrinsic size; shrink only when the card is smaller. */
-.carousel-media img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; position: absolute; inset: 0; margin: auto; border-radius: 0 0 16px 16px; pointer-events: none; }
+.carousel-media img { display: block; width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; border-radius: 0 0 16px 16px; pointer-events: none; }
 .carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
 .empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #969da8; }
 .empty-copy strong { color: #747d8b; font-size: 15px; font-weight: 500; }
