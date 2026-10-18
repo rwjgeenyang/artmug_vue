@@ -74,10 +74,10 @@ function keyboard(event) {
 <style scoped>
 .carousel { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 .carousel:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }
-.carousel-controls { align-self: center; display: flex; align-items: center; gap: 16px; padding: 8px 12px; border: 1px solid #e9dfe3; border-radius: 16px; background: #faf6f7; box-shadow: 0 4px 16px #39202b0a; }
-.counter-text { font-size: 12px; min-width: 42px; text-align: center; color: #74636b; font-variant-numeric: tabular-nums; }
-.carousel-controls button { background: #fff; color: #44363c; border: 1px solid #e3dce0; width: 36px; height: 36px; border-radius: 50%; margin: 0; padding: 0; font-size: 18px; }
-.carousel-controls button:not(:disabled):hover { background: #f1e8ec; }
+.carousel-controls { align-self: center; display: flex; align-items: center; gap: 16px; padding: 8px 12px; border: 1px solid #e3e5e9; border-radius: 16px; background: #fff; box-shadow: 0 4px 16px #252b3510; }
+.counter-text { font-size: 12px; min-width: 42px; text-align: center; color: #6e7580; font-variant-numeric: tabular-nums; }
+.carousel-controls button { background: #fff; color: #303238; border: 1px solid #d5d8dd; width: 36px; height: 36px; border-radius: 50%; margin: 0; padding: 0; font-size: 18px; }
+.carousel-controls button:not(:disabled):hover { background: #f5f6f8; }
 button:disabled { opacity: .3; cursor: default; }
 .carousel-surface { border-radius: 18px; box-shadow: 0 6px 24px #252b3510; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
 .carousel-surface.dragging { cursor: grabbing; }
@@ -88,8 +88,8 @@ button:disabled { opacity: .3; cursor: default; }
 .gif-media.gif-filled { aspect-ratio: auto; display: block; }
 .carousel-media img { display: block; width: 100%; height: auto; border-radius: 18px; pointer-events: none; }
 .carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
-.empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #77717a; }
-.empty-copy strong { color: #57515a; font-size: 15px; font-weight: 500; }
+.empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #969da8; }
+.empty-copy strong { color: #747d8b; font-size: 15px; font-weight: 500; }
 .empty-symbol { font-size: 28px; letter-spacing: .1em; color: #b8bdc6; }
 @media (prefers-reduced-motion: reduce) { .carousel-content { transition: none; } }
 </style>
