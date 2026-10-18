@@ -76,7 +76,8 @@ function keyboard(event) {
 .carousel:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }
 .carousel-controls { align-self: center; display: flex; align-items: center; gap: 16px; padding: 8px 12px; border: 1px solid #e9dfe3; border-radius: 16px; background: #faf6f7; box-shadow: 0 4px 16px #39202b0a; }
 .counter-text { font-size: 12px; min-width: 42px; text-align: center; color: #74636b; font-variant-numeric: tabular-nums; }
-.carousel-controls button { width: 36px; height: 36px; border-radius: 50%; margin: 0; padding: 0; font-size: 18px; }
+.carousel-controls button { background: #fff; color: #44363c; border: 1px solid #e3dce0; width: 36px; height: 36px; border-radius: 50%; margin: 0; padding: 0; font-size: 18px; }
+.carousel-controls button:not(:disabled):hover { background: #f1e8ec; }
 button:disabled { opacity: .3; cursor: default; }
 .carousel-surface { border-radius: 18px; box-shadow: 0 6px 24px #252b3510; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; user-select: none; }
 .carousel-surface.dragging { cursor: grabbing; }
