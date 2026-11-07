@@ -10,6 +10,8 @@ const error = ref("");
 const valueOf = (type) => items.value.find(item => item?.type === type)?.value;
 const name = computed(() => valueOf("name") || "작가 이름");
 const introduction = computed(() => valueOf("intro") || valueOf("text") || "자기소개가 들어갈 공간입니다.");
+const about = computed(() => valueOf("about") || "소개글이 들어갈 공간입니다.");
+const notice = computed(() => valueOf("notice") || "주의사항이 들어갈 공간입니다.");
 const job = computed(() => valueOf("job") || "");
 function safeUrl(value) {
   try {
@@ -30,9 +32,9 @@ function youtubeEmbed(value) {
   } catch { return ""; }
 }
 const categories = [
-  { type: "broadcast", label: "방송화면 및 대기화면", number: "02" },
-  { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼", number: "03" },
-  { type: "ingame", label: "인게임", number: "04" },
+  { type: "broadcast", label: "방송화면 및 대기화면", number: "03" },
+  { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼", number: "04" },
+  { type: "ingame", label: "인게임", number: "05" },
 ];
 const selectedMedia = ref({ broadcast: "gif", wallpaper: "gif", ingame: "gif" });
 const mediaSections = computed(() => categories.map(category => ({
@@ -81,6 +83,11 @@ onMounted(load);
       </div>
     </section>
 
+    <section class="section" aria-labelledby="about-heading">
+      <header class="section-heading"><span class="number">02</span><h2 id="about-heading">소개글</h2></header>
+      <div class="information-card"><p>{{ about }}</p></div>
+    </section>
+
     <section v-for="category in mediaSections" :key="category.type" class="section" :aria-labelledby="category.type + '-heading'">
       <header class="section-heading category-heading">
         <span class="number">{{ category.number }}</span>
@@ -98,12 +105,18 @@ onMounted(load);
           :kind="selectedMedia[category.type]" :label="category.label" />
       </div>
     </section>
+    <section class="section" aria-labelledby="notice-heading">
+      <header class="section-heading"><span class="number">06</span><h2 id="notice-heading">주의사항</h2></header>
+      <div class="information-card"><p>{{ notice }}</p></div>
+    </section>
   </main>
 </template>
 
 <style>
 html.artmug-auto-height, html.artmug-auto-height body { overflow: hidden; }
 
+.information-card { padding: clamp(24px, 4vw, 32px); border: 1px solid #e3e5e9; border-radius: 20px; background: #fff; color: #303238; box-shadow: 0 10px 32px #252b3510; }
+.information-card p { font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
 .category-heading { flex-wrap: wrap; }
 .category-heading h2 { flex: 1; min-width: 0; }
 .media-switch { display: flex; flex-shrink: 0; gap: 4px; margin-left: auto; padding: 4px; border: 1px solid #e3e5e9; border-radius: 12px; background: #f5f6f8; }
