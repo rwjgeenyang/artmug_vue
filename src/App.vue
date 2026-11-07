@@ -32,9 +32,19 @@ function youtubeEmbed(value) {
     return /^[A-Za-z0-9_-]{11}$/.test(id) ? "https://www.youtube-nocookie.com/embed/" + id : "";
   } catch { return ""; }
 }
-const videos = computed(() => items.value
-  .filter(item => item?.type === "youtube")
-  .map(item => youtubeEmbed(item.value)).filter(Boolean));
+const videoCategories = [
+  { type: "broadcast", label: "방송화면 및 대기화면", number: "03" },
+  { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼", number: "04" },
+  { type: "ingame", label: "인게임", number: "05" },
+];
+const videoSections = computed(() => videoCategories.map(category => ({
+  ...category,
+  urls: items.value
+    // Keep legacy YouTube rows visible until their sheet types are updated.
+    .filter(item => item?.type === category.type ||
+      (category.type === "broadcast" && item?.type === "youtube"))
+    .map(item => youtubeEmbed(item.value)).filter(Boolean),
+})));
 
 const pageElement = ref(null);
 let disconnectEmbed = () => {};
@@ -75,9 +85,9 @@ onMounted(load);
       <MediaCarousel :urls="gifs" kind="gif" label="GIF" />
     </section>
 
-    <section class="section" aria-labelledby="youtube-heading">
-      <header class="section-heading"><span class="number">03</span><h2 id="youtube-heading">작업물 <small>YouTube</small></h2></header>
-      <MediaCarousel :urls="videos" kind="youtube" label="작업물" />
+    <section v-for="category in videoSections" :key="category.type" class="section" :aria-labelledby="category.type + '-heading'">
+      <header class="section-heading"><span class="number">{{ category.number }}</span><h2 :id="category.type + '-heading'">{{ category.label }}</h2></header>
+      <MediaCarousel :urls="category.urls" kind="youtube" :label="category.label" />
     </section>
   </main>
 </template>
