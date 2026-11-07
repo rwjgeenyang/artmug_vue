@@ -17,9 +17,6 @@ function safeUrl(value) {
     return ["https:", "http:"].includes(url.protocol) ? url.href : "";
   } catch { return ""; }
 }
-const gifs = computed(() => items.value
-  .filter(item => item?.type === "gif")
-  .map(item => safeUrl(item.value)).filter(Boolean));
 function youtubeEmbed(value) {
   try {
     const url = new URL(String(value));
@@ -32,16 +29,20 @@ function youtubeEmbed(value) {
     return /^[A-Za-z0-9_-]{11}$/.test(id) ? "https://www.youtube-nocookie.com/embed/" + id : "";
   } catch { return ""; }
 }
-const videoCategories = [
-  { type: "broadcast", label: "방송화면 및 대기화면", number: "03" },
-  { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼", number: "04" },
-  { type: "ingame", label: "인게임", number: "05" },
+const categories = [
+  { type: "broadcast", label: "방송화면 및 대기화면", number: "02" },
+  { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼", number: "03" },
+  { type: "ingame", label: "인게임", number: "04" },
 ];
-const videoSections = computed(() => videoCategories.map(category => ({
+const selectedMedia = ref({ broadcast: "gif", wallpaper: "gif", ingame: "gif" });
+const mediaSections = computed(() => categories.map(category => ({
   ...category,
-  urls: items.value
-    // Keep legacy YouTube rows visible until their sheet types are updated.
-    .filter(item => item?.type === category.type ||
+  gif: items.value
+    .filter(item => item?.type === category.type + "_gif" ||
+      (category.type === "broadcast" && item?.type === "gif"))
+    .map(item => safeUrl(item.value)).filter(Boolean),
+  youtube: items.value
+    .filter(item => item?.type === category.type || item?.type === category.type + "_youtube" ||
       (category.type === "broadcast" && item?.type === "youtube"))
     .map(item => youtubeEmbed(item.value)).filter(Boolean),
 })));
@@ -80,18 +81,37 @@ onMounted(load);
       </div>
     </section>
 
-    <section class="section" aria-labelledby="gif-heading">
-      <header class="section-heading"><span class="number">02</span><h2 id="gif-heading">GIF</h2></header>
-      <MediaCarousel :urls="gifs" kind="gif" label="GIF" />
-    </section>
-
-    <section v-for="category in videoSections" :key="category.type" class="section" :aria-labelledby="category.type + '-heading'">
-      <header class="section-heading"><span class="number">{{ category.number }}</span><h2 :id="category.type + '-heading'">{{ category.label }}</h2></header>
-      <MediaCarousel :urls="category.urls" kind="youtube" :label="category.label" />
+    <section v-for="category in mediaSections" :key="category.type" class="section" :aria-labelledby="category.type + '-heading'">
+      <header class="section-heading category-heading">
+        <span class="number">{{ category.number }}</span>
+        <h2 :id="category.type + '-heading'">{{ category.label }}</h2>
+        <div class="media-switch" role="group" :aria-label="category.label + ' 표시 형식'">
+          <button v-for="kind in ['gif', 'youtube']" :key="kind" type="button"
+            :aria-pressed="selectedMedia[category.type] === kind"
+            :aria-controls="category.type + '-media'"
+            @click="selectedMedia[category.type] = kind">{{ kind === 'gif' ? 'GIF' : 'YOUTUBE' }}</button>
+        </div>
+      </header>
+      <div :id="category.type + '-media'">
+        <MediaCarousel :key="category.type + selectedMedia[category.type]"
+          :urls="category[selectedMedia[category.type]]"
+          :kind="selectedMedia[category.type]" :label="category.label" />
+      </div>
     </section>
   </main>
 </template>
 
 <style>
 html.artmug-auto-height, html.artmug-auto-height body { overflow: hidden; }
+
+.category-heading { flex-wrap: wrap; }
+.category-heading h2 { flex: 1; min-width: 0; }
+.media-switch { display: flex; flex-shrink: 0; gap: 4px; margin-left: auto; padding: 4px; border: 1px solid #e3e5e9; border-radius: 12px; background: #f5f6f8; }
+.media-switch button { margin: 0; padding: 8px 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #747982; font-size: 12px; font-weight: 600; }
+.media-switch button[aria-pressed="true"] { background: #fff; color: #303238; border-color: #e3e5e9; box-shadow: 0 2px 6px #252b3510; }
+.media-switch button:hover { color: #303238; }
+@media (max-width: 560px) {
+  .category-heading { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+  .category-heading .media-switch { grid-column: 2; justify-self: end; }
+}
 </style>
