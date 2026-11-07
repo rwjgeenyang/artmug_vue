@@ -1,18 +1,17 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
+import MediaFrame from './MediaFrame.vue';
 
 const props = defineProps({ urls: { type: Array, default: () => [] }, kind: String, label: String });
-const slides = computed(() => props.urls.length ? props.urls : ['', '']);
+const slides = computed(() => props.urls.length ? props.urls : ['']);
 const index = ref(0);
 const offset = ref(0);
 const dragging = ref(false);
-const failed = ref(false);
 let gesture = null;
-watch(() => props.urls, () => { index.value = 0; failed.value = false; });
+watch(() => props.urls, () => { index.value = 0; });
 const current = computed(() => slides.value[index.value]);
 function move(direction) {
   const next = Math.max(0, Math.min(slides.value.length - 1, index.value + direction));
-  if (next !== index.value) { failed.value = false; }
   index.value = next;
   offset.value = 0;
 }
@@ -53,17 +52,10 @@ function keyboard(event) {
   <div class="carousel" role="region" aria-roledescription="슬라이더" :aria-label="label" tabindex="0" @keydown="keyboard">
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
-        <div class="carousel-media" :class="{ 'gif-media': kind === 'gif', 'gif-filled': kind === 'gif' && current && !failed }">
-          <template v-if="current">
-            <img v-if="kind === 'gif' && !failed" :key="current" :src="current" :alt="label + ' ' + (index + 1)" draggable="false" @error="failed = true" />
-            <iframe v-else-if="kind === 'youtube'" :src="current" :title="label + ' ' + (index + 1)" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            <p v-else class="empty-copy">이미지를 불러오지 못했습니다.</p>
-          </template>
-          <div v-else class="empty-copy"><span class="empty-symbol">{{ kind === 'gif' ? 'GIF' : '▷' }}</span><strong>{{ label }} {{ String(index + 1).padStart(2, '0') }}</strong><span>{{ kind === 'gif' ? '애니메이션이 들어갈 공간' : '유튜브 영상이 들어갈 공간' }}</span></div>
-        </div>
+        <MediaFrame :src="current" :kind="kind" :label="label + ' ' + (index + 1)" />
       </div>
     </div>
-    <div class="carousel-controls" :aria-label="label + ' 탐색'">
+    <div v-if="urls.length" class="carousel-controls" :aria-label="label + ' 탐색'">
       <button type="button" :disabled="index === 0" :aria-label="label + ' 이전'" @click="move(-1)">←</button>
       <span class="counter-text" aria-live="polite">{{ index + 1 }} / {{ slides.length }}</span>
       <button type="button" :disabled="index === slides.length - 1" :aria-label="label + ' 다음'" @click="move(1)">→</button>
@@ -83,13 +75,5 @@ button:disabled { opacity: .3; cursor: default; }
 .carousel-surface.dragging { cursor: grabbing; }
 .carousel-content { transition: transform .25s ease; }
 .dragging .carousel-content { transition: none; }
-.carousel-media { aspect-ratio: 16 / 9; position: relative; display: grid; place-items: center; background: #f5f6f8; overflow: hidden; }
-.gif-media { aspect-ratio: 16 / 10; }
-.gif-media.gif-filled { aspect-ratio: auto; display: block; }
-.carousel-media img { display: block; width: 100%; height: auto; border-radius: 18px; pointer-events: none; }
-.carousel-media iframe { display: block; border: 0; width: 100%; height: 100%; position: absolute; inset: 0; }
-.empty-copy { display: flex; align-items: center; flex-direction: column; gap: 12px; padding: 24px; text-align: center; font-size: 12px; color: #969da8; }
-.empty-copy strong { color: #747d8b; font-size: 15px; font-weight: 500; }
-.empty-symbol { font-size: 28px; letter-spacing: .1em; color: #b8bdc6; }
 @media (prefers-reduced-motion: reduce) { .carousel-content { transition: none; } }
 </style>
