@@ -3,6 +3,7 @@ import { computed, onMounted, onBeforeUnmount, ref } from "vue";
 import { getPageData } from "./services/sheetApi";
 import { connectEmbedHeight } from "./services/embedHeight";
 import MediaCarousel from "./components/MediaCarousel.vue";
+import CollaboratorCard from "./components/CollaboratorCard.vue";
 
 const items = ref([]);
 const loading = ref(true);
@@ -48,6 +49,30 @@ const mediaSections = computed(() => categories.map(category => ({
       (category.type === "broadcast" && item?.type === "youtube"))
     .map(item => youtubeEmbed(item.value)).filter(Boolean),
 })));
+
+function artmugUrl(value) {
+  try {
+    const url = new URL(String(value));
+    return ['https:', 'http:'].includes(url.protocol) &&
+      ['artmug.kr', 'www.artmug.kr'].includes(url.hostname) ? url.href : '';
+  } catch { return ''; }
+}
+const collaborators = computed(() => {
+  const groups = new Map();
+  for (const item of items.value) {
+    const match = /^collab_([1-9]\d*)_(name|url|intro|gif|youtube|note)$/.exec(item?.type || '');
+    if (!match) continue;
+    const [, id, field] = match;
+    if (!groups.has(id)) groups.set(id, { id });
+    const group = groups.get(id);
+    if (group[field] === undefined) group[field] = String(item.value ?? '').trim();
+  }
+  const artists = [...groups.values()]
+    .filter(artist => artist.name)
+    .sort((a, b) => Number(a.id) - Number(b.id))
+    .map(artist => ({ ...artist, gif: safeUrl(artist.gif), youtube: youtubeEmbed(artist.youtube), url: artmugUrl(artist.url) }));
+  return artists.length ? artists : [{ id: 'placeholder', name: '협업작가 이름', intro: '', url: '', gif: '', youtube: '', note: '' }];
+});
 
 const pageElement = ref(null);
 let disconnectEmbed = () => {};
@@ -105,8 +130,14 @@ onMounted(load);
           :kind="selectedMedia[category.type]" :label="category.label" />
       </div>
     </section>
+    <section class="section" aria-labelledby="collaborators-heading">
+      <header class="section-heading"><span class="number">06</span><h2 id="collaborators-heading">협업작가</h2></header>
+      <div class="collaborators-list">
+        <CollaboratorCard v-for="artist in collaborators" :key="artist.id" :artist="artist" />
+      </div>
+    </section>
     <section class="section" aria-labelledby="notice-heading">
-      <header class="section-heading"><span class="number">06</span><h2 id="notice-heading">주의사항</h2></header>
+      <header class="section-heading"><span class="number">07</span><h2 id="notice-heading">주의사항</h2></header>
       <div class="information-card"><p>{{ notice }}</p></div>
     </section>
   </main>
@@ -115,6 +146,7 @@ onMounted(load);
 <style>
 html.artmug-auto-height, html.artmug-auto-height body { overflow: hidden; }
 
+.collaborators-list { display: flex; flex-direction: column; gap: 40px; }
 .information-card { padding: clamp(24px, 4vw, 32px); border: 1px solid #e3e5e9; border-radius: 20px; background: #fff; color: #303238; box-shadow: 0 10px 32px #252b3510; }
 .information-card p { font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
 .category-heading { flex-wrap: wrap; }
