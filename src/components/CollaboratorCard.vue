@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import MediaFrame from './MediaFrame.vue';
-const props = defineProps({ artist: { type: Object, required: true } });
+defineProps({ artist: { type: Object, required: true } });
 const kind = ref('gif');
 </script>
 
@@ -40,7 +40,6 @@ a { color: inherit; text-decoration: underline; text-underline-offset: 5px; }
 a:hover { color: #646b75; }
 a:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }
 .collaborator-note { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e3e5e9; color: var(--text-color); }
-.collaborator-note p { font-size: var(--text-size); color: var(--text-color); font-weight: var(--text-weight); }
 .collaborator-note p + p { margin-top: 8px; }
 @media (max-width: 640px) { .collaborator { grid-template-columns: minmax(0, 1fr); gap: 16px; } .collaborator-copy { margin-top: 0; } }
 </style>
