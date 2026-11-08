@@ -1,5 +1,6 @@
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref } from "vue";
+import { computed, onMounted, onBeforeUnmount, nextTick, ref } from "vue";
+import { createMediaPreloader } from "./services/mediaPreload";
 import { getPageData } from "./services/sheetApi";
 import { connectEmbedHeight } from "./services/embedHeight";
 import MediaCarousel from "./components/MediaCarousel.vue";
@@ -87,6 +88,8 @@ const collaborators = computed(() => {
   return artists.length ? artists : [{ id: 'placeholder', name: '협업작가 이름', intro: '', url: '', gif: '', youtube: '', note: '' }];
 });
 
+const preloader = createMediaPreloader();
+onBeforeUnmount(() => preloader.dispose());
 const pageElement = ref(null);
 let disconnectEmbed = () => {};
 onMounted(() => { disconnectEmbed = connectEmbedHeight(pageElement.value); });
@@ -95,7 +98,13 @@ onBeforeUnmount(() => disconnectEmbed());
 async function load() {
   loading.value = true;
   error.value = "";
-  try { items.value = await getPageData(); }
+  try {
+    items.value = await getPageData();
+    // Render the selected media first, then warm all other GIFs in the background.
+    await nextTick();
+    const media = [...mediaSections.value.flatMap(section => section.works), ...collaborators.value];
+    preloader.preload(media.map(work => work.gif), media.some(work => work.youtube));
+  }
   catch { error.value = "내용을 불러오지 못했습니다."; }
   finally { loading.value = false; }
 }
