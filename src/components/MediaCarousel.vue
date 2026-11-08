@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import MediaFrame from './MediaFrame.vue';
 
-const props = defineProps({ works: { type: Array, default: () => [] }, kind: String, label: String });
+const props = defineProps({ works: { type: Array, default: () => [] }, kind: String, label: String, pending: Boolean });
 const slides = computed(() => props.works.length ? props.works : [{ number: 1, gif: '', youtube: '', description: '' }]);
 const index = ref(0);
 const offset = ref(0);
@@ -72,12 +72,12 @@ function keyboard(event) {
 <template>
   <div class="carousel" role="region" aria-roledescription="슬라이더" :aria-label="label" tabindex="0" @keydown="keyboard">
     <div class="information-card work-description">
-      <p :style="{ fontSize: '18px', fontWeight: '700', ...current.descriptionStyle }">{{ current.description || '작품 설명을 준비 중입니다···' }}</p>
+      <p :style="{ fontSize: '18px', fontWeight: '700', ...current.descriptionStyle }">{{ pending ? '불러오는 중입니다...' : current.description || '작품 설명을 준비 중입니다···' }}</p>
       <div v-if="displayDate" class="work-date" :style="{ fontSize: '18px', fontWeight: '700', ...current.dateStyle }">{{ displayDate }}</div>
     </div>
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div ref="content" class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
-        <MediaFrame :src="current[kind]" :kind="kind" :label="label + ' ' + current.number" />
+        <MediaFrame :pending="pending" :src="current[kind]" :kind="kind" :label="label + ' ' + current.number" />
       </div>
     </div>
     <div v-if="works.length" class="carousel-controls" :aria-label="label + ' 탐색'">

@@ -44,11 +44,11 @@ const processSteps = computed(() => {
   }
   return [...steps.values()].sort((a, b) => a.number - b.number);
 });
-const processRevisions = computed(() => valueOf('process_revisions') || '수정 횟수를 입력해 주세요.');
-const name = computed(() => valueOf("name") || "작가 이름");
-const introduction = computed(() => valueOf("intro") || valueOf("text") || "작가 소개가 들어갈 공간입니다.");
-const about = computed(() => valueOf("about") || "소개글이 들어갈 공간입니다.");
-const notice = computed(() => valueOf("notice") || "주의사항이 들어갈 공간입니다.");
+const processRevisions = computed(() => loading.value ? '불러오는 중입니다...' : valueOf('process_revisions') || '수정 횟수를 입력해 주세요.');
+const name = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("name") || "작가 이름");
+const introduction = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("intro") || valueOf("text") || "작가 소개가 들어갈 공간입니다.");
+const about = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("about") || "소개글이 들어갈 공간입니다.");
+const notice = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("notice") || "주의사항이 들어갈 공간입니다.");
 const noticeLastColor = computed(() => validColor(valueOf('notice_last_color')) || '#c93c4b');
 const noticeLines = computed(() => String(notice.value).split('^').map(line => line.trim().replace(/^[●•]\s*/, '')).filter(Boolean));
 const applicationFields = computed(() => {
@@ -170,7 +170,7 @@ onMounted(load);
 
 <template>
   <main class="page" ref="pageElement" :style="pageStyle">
-    <p v-if="loading" class="status" role="status">내용을 불러오는 중입니다…</p>
+    <p v-if="loading" class="status" role="status">불러오는 중입니다...</p>
     <div v-if="error" class="status" role="alert">
       {{ error }} <button type="button" @click="load">다시 불러오기</button>
     </div>
@@ -205,7 +205,7 @@ onMounted(load);
             </div>
           </li>
         </ol>
-        <p v-else>작업 진행 방식을 준비 중입니다···</p>
+        <p v-else>{{ loading ? '불러오는 중입니다...' : '작업 진행 방식을 준비 중입니다···' }}</p>
         <div class="revision-summary">
           <span class="revision-label">수정 횟수</span>
           <p :style="{ fontWeight: '700', ...styleFor('process_revisions') }">{{ processRevisions }}</p>
@@ -226,19 +226,21 @@ onMounted(load);
       </header>
       <div :id="category.type + '-media'">
         <MediaCarousel :key="category.type"
-          :works="category.works"
+          :works="category.works" :pending="loading"
           :kind="selectedMedia[category.type]" :label="category.label" />
       </div>
     </section>
     <section class="section" aria-labelledby="collaborators-heading">
       <header class="section-heading"><span class="number">08</span><h2 id="collaborators-heading">협업작가</h2></header>
-      <div class="collaborators-list">
+      <div v-if="loading" class="information-card" role="status">불러오는 중입니다...</div>
+      <div v-else class="collaborators-list">
         <CollaboratorCard v-for="artist in collaborators" :key="artist.id" :artist="artist" />
       </div>
     </section>
     <section class="section" aria-labelledby="application-heading">
       <header class="section-heading"><span class="number">09</span><h2 id="application-heading">신청양식</h2></header>
-      <ApplicationForm :fields="applicationFields" />
+      <div v-if="loading" class="information-card" role="status">불러오는 중입니다...</div>
+      <ApplicationForm v-else :fields="applicationFields" />
     </section>
     <section class="section" aria-labelledby="notice-heading">
       <header class="section-heading"><span class="number">10</span><h2 id="notice-heading">주의사항</h2></header>

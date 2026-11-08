@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 
-const props = defineProps({ src: String, kind: String, label: String, lazy: Boolean });
+const props = defineProps({ src: String, kind: String, label: String, lazy: Boolean, pending: Boolean });
 // Keep the last loaded GIF's proportions until the next image has dimensions.
 const ratio = ref(16 / 9);
 const loading = ref(false);
@@ -26,11 +26,12 @@ function errored(event) {
 </script>
 
 <template>
-  <div class="media-frame" :style="{ aspectRatio: kind === 'youtube' ? 16 / 9 : ratio }" :aria-busy="loading">
-    <p v-if="!src" class="media-message">준비 중입니다···</p>
+  <div class="media-frame" :style="{ aspectRatio: kind === 'youtube' ? 16 / 9 : ratio }" :aria-busy="pending || loading">
+    <p v-if="pending" class="media-message" role="status">불러오는 중입니다...</p>
+    <p v-else-if="!src" class="media-message">준비 중입니다···</p>
     <p v-else-if="failed" class="media-message">미디어를 불러오지 못했습니다.</p>
     <template v-else>
-      <p v-if="loading" class="media-message" role="status">불러오는 중입니다···</p>
+      <p v-if="loading" class="media-message" role="status">불러오는 중입니다...</p>
       <img v-if="kind === 'gif'" :key="src" :src="src" :alt="label"
         :class="{ pending: loading }" :loading="lazy ? 'lazy' : 'eager'"
         draggable="false" @load="loaded" @error="errored" />
