@@ -25,7 +25,7 @@ const pageStyle = computed(() => {
   return {
     '--text-color': base.color || '#303238',
     '--text-size': base.fontSize || '15px',
-    '--text-weight': base.fontWeight || '400',
+    '--text-weight': '700',
     '--accent-color': validColor(valueOf('accent_color')) || '#c93c4b',
     '--accent-background': validColor(valueOf('accent_background')) || '#fff0f2',
     '--accent-border': validColor(valueOf('accent_border')) || '#e77a87',
@@ -46,9 +46,10 @@ const processSteps = computed(() => {
 });
 const processRevisions = computed(() => valueOf('process_revisions') || '수정 횟수를 입력해 주세요.');
 const name = computed(() => valueOf("name") || "작가 이름");
-const introduction = computed(() => valueOf("intro") || valueOf("text") || "자기소개가 들어갈 공간입니다.");
+const introduction = computed(() => valueOf("intro") || valueOf("text") || "작가 소개가 들어갈 공간입니다.");
 const about = computed(() => valueOf("about") || "소개글이 들어갈 공간입니다.");
 const notice = computed(() => valueOf("notice") || "주의사항이 들어갈 공간입니다.");
+const noticeLastColor = computed(() => validColor(valueOf('notice_last_color')) || '#c93c4b');
 const noticeLines = computed(() => String(notice.value).split('^').map(line => line.trim().replace(/^[●•]\s*/, '')).filter(Boolean));
 const applicationFields = computed(() => {
   const rows = items.value.filter(item => /^form_[1-9]\d*_(title|description|placeholder)$/.test(item?.type || ''));
@@ -174,7 +175,7 @@ onMounted(load);
     </div>
 
     <section class="section" aria-labelledby="intro-heading">
-      <header class="section-heading"><span class="number">01</span><h2 id="intro-heading">자기소개</h2></header>
+      <header class="section-heading"><span class="number">01</span><h2 id="intro-heading">작가 소개</h2></header>
       <div class="introduction">
         <img v-if="profileImage && !profileFailed" class="profile-image" :src="profileImage" :alt="name + ' 프로필'" @error="profileFailed = true" />
         <div v-else class="profile-placeholder" aria-label="프로필 이미지 자리">PROFILE</div>
@@ -197,8 +198,10 @@ onMounted(load);
         <ol v-if="processSteps.length" class="process-steps" :class="{ 'many-steps': processSteps.length > 6 }" :style="{ '--step-count': processSteps.length }">
           <li v-for="step in processSteps" :key="step.number" class="process-step">
             <span class="step-number">STEP {{ String(step.number).padStart(2, '0') }}</span>
-            <p :style="{ fontWeight: '700', ...styleFor('process_' + step.number) }">{{ step.title }}</p>
+            <div class="step-content">
+            <p :style="styleFor('process_' + step.number)">{{ step.title }}</p>
             <p v-if="step.revisions" class="step-revisions" :style="{ fontWeight: '700', ...styleFor('process_' + step.number + '_revisions') }">{{ step.revisions }}</p>
+            </div>
           </li>
         </ol>
         <p v-else>작업 진행 방식을 준비 중입니다···</p>
@@ -239,8 +242,8 @@ onMounted(load);
     <section class="section" aria-labelledby="notice-heading">
       <header class="section-heading"><span class="number">09</span><h2 id="notice-heading">주의사항</h2></header>
       <div class="information-card">
-        <ul class="notice-list" :style="styleFor('notice')">
-          <li v-for="(line, index) in noticeLines" :key="index"><span class="notice-bullet" aria-hidden="true">●</span><span>{{ line }}</span></li>
+        <ul class="notice-list" :style="{ fontSize: '18px', ...styleFor('notice') }">
+          <li v-for="(line, index) in noticeLines" :key="index" :style="index === noticeLines.length - 1 ? { color: noticeLastColor } : undefined"><span class="notice-bullet" aria-hidden="true">●</span><span>{{ line }}</span></li>
         </ul>
       </div>
     </section>
@@ -260,14 +263,15 @@ onMounted(load);
 .page .intro-text, .page .job { color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); }
 .page .number { color: var(--accent-color); font-size: 16px; font-weight: 800; }
 .process-steps { display: grid; grid-template-columns: repeat(var(--step-count), minmax(0, 1fr)); gap: 24px; list-style: none; padding: 0; margin: 0; }
-.process-step { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; gap: 12px; padding: 18px 12px; border: 1px solid #e3e5e9; border-radius: 14px; background: #fafafa; text-align: center; }
+.process-step { position: relative; display: grid; grid-template-rows: auto 1fr; min-height: 140px; gap: 12px; padding: 18px 12px; border: 1px solid #e3e5e9; border-radius: 14px; background: #fafafa; text-align: center; }
 .process-step:not(:last-child)::after { content: '→'; position: absolute; right: -22px; top: 50%; transform: translateY(-50%); color: var(--accent-color); font-size: 18px; }
 .process-steps.many-steps { grid-template-columns: minmax(0, 1fr); gap: 28px; }
 .process-steps.many-steps .process-step:not(:last-child)::after { content: '↓'; top: auto; bottom: -25px; right: 50%; transform: translateX(50%); }
+.step-content { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; min-width: 0; }
 .step-number { color: var(--accent-color); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
 .step-revisions { padding: 5px 8px; border-radius: 8px; background: var(--accent-background); }
 .revision-summary { display: flex; justify-content: center; text-align: center; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 16px 20px; border: 1px solid var(--accent-border); border-radius: 12px; background: var(--accent-background); }
-.revision-label { color: var(--accent-color); font-size: 14px; font-weight: 700; }
+.revision-label { color: var(--accent-color); font-size: var(--text-size); font-weight: 700; }
 .notice-list { padding: 0; margin: 0; list-style: none; color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); line-height: 1.8; }
 .notice-list li { display: flex; align-items: baseline; gap: 10px; overflow-wrap: anywhere; }
 .notice-list li + li { border-top: 1px solid #e3e5e9; margin-top: 16px; padding-top: 16px; }
@@ -283,7 +287,7 @@ onMounted(load);
 .category-heading { flex-wrap: wrap; }
 .category-heading h2 { flex: 1; min-width: 0; }
 .media-switch { display: flex; flex-shrink: 0; gap: 4px; margin-left: auto; padding: 4px; border: 1px solid #e3e5e9; border-radius: 12px; background: #f5f6f8; }
-.media-switch button { margin: 0; padding: 8px 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #747982; font-size: 12px; font-weight: 600; }
+.media-switch button { margin: 0; padding: 8px 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #747982; font-size: 12px; font-weight: 700; }
 .media-switch button[aria-pressed="true"] { background: var(--accent-background); color: var(--accent-color); border-color: var(--accent-border); box-shadow: 0 2px 6px #252b3510; }
 .media-switch button:hover { color: #303238; }
 @media (max-width: 560px) {

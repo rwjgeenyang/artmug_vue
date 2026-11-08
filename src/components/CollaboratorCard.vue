@@ -13,7 +13,7 @@ const kind = ref('gif');
           :aria-pressed="kind === format" :aria-controls="'collaborator-media-' + artist.id"
           @click="kind = format">{{ format === 'gif' ? 'GIF' : 'YOUTUBE' }}</button>
       </div>
-      <MediaFrame :id="'collaborator-media-' + artist.id" :src="artist[kind]"
+      <MediaFrame class="collaborator-frame" :id="'collaborator-media-' + artist.id" :src="artist[kind]"
         :kind="kind" :label="artist.name + ' 협업 작품'" lazy />
     </div>
     <div class="information-card collaborator-copy">
@@ -32,14 +32,16 @@ const kind = ref('gif');
 </template>
 
 <style scoped>
-.collaborator { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
-.collaborator-work { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.collaborator-copy { min-width: 0; margin-top: 44px; }
+.collaborator { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; align-items: stretch; }
+.collaborator-work { display: contents; }
+.collaborator .media-switch { grid-column: 1; grid-row: 1; justify-self: end; }
+.collaborator-frame { grid-column: 1; grid-row: 2; height: 100%; }
+.collaborator-copy { grid-column: 2; grid-row: 2; min-width: 0; margin: 0; }
 h3 { margin: 0 0 16px; font-size: 21px; overflow-wrap: anywhere; }
 a { color: inherit; text-decoration: underline; text-underline-offset: 5px; }
 a:hover { color: #646b75; }
 a:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }
 .collaborator-note { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e3e5e9; color: var(--text-color); }
 .collaborator-note p + p { margin-top: 8px; }
-@media (max-width: 640px) { .collaborator { grid-template-columns: minmax(0, 1fr); gap: 16px; } .collaborator-copy { margin-top: 0; } }
+@media (max-width: 640px) { .collaborator { grid-template-columns: minmax(0, 1fr); gap: 16px; } .collaborator-frame { height: auto; } .collaborator-copy { grid-column: 1; grid-row: 3; } }
 </style>

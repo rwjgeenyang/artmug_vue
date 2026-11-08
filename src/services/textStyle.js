@@ -10,8 +10,5 @@ export function textStyle(valueOf, key) {
   if (color) style.color = color;
   const size = Number(valueOf(key + '_font_size'));
   if (Number.isFinite(size) && size >= 10 && size <= 48) style.fontSize = size + 'px';
-  const bold = String(valueOf(key + '_bold') ?? '').trim().toLowerCase();
-  if (['true', '1', 'yes'].includes(bold)) style.fontWeight = '700';
-  else if (['false', '0', 'no'].includes(bold)) style.fontWeight = '400';
   return style;
 }
