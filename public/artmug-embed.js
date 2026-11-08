@@ -1,3 +1,25 @@
+// Artmug's parent document owns the expand button and clipping styles.
+(() => {
+  function expandDetail() {
+    const root = document.querySelector('.subContent');
+    if (!root) return;
+    if (!document.getElementById('artmug-detail-expanded')) {
+      const style = document.createElement('style');
+      style.id = 'artmug-detail-expanded';
+      style.textContent = "/* Run in the Artmug document, outside the portfolio iframe. */\n.subContent .detailinfo,\n.subContent .detailinfo .showcontent,\n.subContent .showstep1 {\n  max-height: none !important;\n  height: auto !important;\n  overflow: visible !important;\n}\n.subContent .btn_open_btn,\n.subContent .btn_open,\n.subContent .btn_close {\n  display: none !important;\n}";
+      document.head.appendChild(style);
+    }
+    root.querySelectorAll('.detailinfo, .detailinfo .showcontent').forEach(box => {
+      box.classList.remove('showstep1');
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', expandDetail, { once: true });
+  } else {
+    expandDetail();
+  }
+})();
+
 (() => {
   const iframe = document.getElementById('artmug-portfolio');
   const origin = 'https://warm-squirrel-5cfab5.netlify.app';
