@@ -57,3 +57,33 @@ GIF/YouTube URL이 없으면 “준비 중입니다···”를 표시합니다.
 기존 번호 없는 type도 지원하며 같은 형식의 시트 등장 순서대로 1, 2…번에 배정됩니다. 같은 번호의 명시적 항목이 있으면 명시적 항목이 우선합니다.
 세로 스크롤은 허용하고 스크롤바만 숨깁니다. 아트머그 iframe에 scrolling=no가 남아 있다면 제거하거나 scrolling=yes로 바꿔야 합니다.
 새 정적 이미지는 public 폴더에 추가한 후 Netlify 배포가 완료되어야 사이트 주소로 이용할 수 있습니다. 이미 온라인에 있는 이미지 URL만 시트에 바꿀 때는 재배포가 필요 없습니다.
+
+## GIF 미리 로딩
+
+시트 데이터를 받은 후 현재 화면을 렌더링하고, 모든 카테고리와 협업작가의 GIF 주소를 Image 객체로 미리 요청합니다. 중복 URL은 한 번만 요청하고 현재 보이는 이미지와 경쟁을 줄이기 위해 백그라운드 요청에는 low 우선순위를 사용합니다. 별도 시트 설정은 필요 없습니다. 첫 다운로드가 끝나기 전에는 전환 시 대기가 남을 수 있고 실제 캐시 재사용은 브라우저에 따라 달라집니다. 방문자가 보지 않는 GIF도 내려받으므로 방문당 전송량이 증가할 수 있습니다.
+유튜브는 플레이어/썸네일 서버에 preconnect 힌트만 추가하며 전체 영상 다운로드를 선행하지 않습니다. 예시 미리보기에는 실제 GIF가 없어 다운로드 속도 측정용은 아닙니다.
+
+## 날짜 / 진행 방식 / 글자 서식
+
+### 작품 날짜
+`broadcast_1_date`의 value에 `2026년 11월 08일`처럼 입력합니다. wallpaper / ingame도 같은 방식입니다. 날짜는 설명 위에 표시하고 날짜 너비보다 0.8em 긴 짧은 구분선을 둡니다. 날짜가 비어 있으면 날짜와 선을 숨깁니다.
+
+### 작업 진행 방식
+소개글 아래의 5칸: process_1, process_2, process_3, process_4, process_5. value에 각 단계 제목을 입력합니다. 기본 표시 순서는 문의 및 상담 → 자료 전달 → 작업 진행 → 수정 및 확인 → 최종 전달입니다.
+전체 수정 안내: process_revisions (예: 기본 수정 2회 / 추가 수정 별도 협의).
+선택적인 단계별 수정 안내: process_1_revisions … process_5_revisions. value에는 ‘수정 1회’ 등 원하는 문구를 입력합니다. 기본 수정 횟수는 임의로 정하지 않았으며 미리보기의 횟수는 예시입니다.
+
+### 서식 지정: 시트 툴바가 아닌 type/value 행
+텍스트 type 뒤에 _color / _font_size / _bold를 붙여 별도 행을 추가합니다.
+- about_color = #303238 (색상은 #RGB 또는 #RRGGBB)
+- about_font_size = 18 (10~48, px 숫자만)
+- about_bold = TRUE (굵게) 또는 FALSE (보통)
+같은 방식으로 name, job, intro, about, notice, process_1 … process_5, process_revisions, process_1_revisions … process_5_revisions, broadcast_1_date, broadcast_1_description, wallpaper_1_date, wallpaper_1_description, ingame_1_date, ingame_1_description, collab_1_name, collab_1_intro, collab_1_note 등에 적용할 수 있습니다. 작품/작가 번호는 각 항목 번호로 바꿉니다. 각 텍스트 블록 전체에 적용되며 한 문장 안의 일부 단어별 서식은 지원하지 않습니다.
+전체 본문 기본값: text_color / text_font_size / text_bold. 개별 설정이 있으면 해당 설정이 우선합니다.
+테마: accent_color (번호/선택 글자, 기본 #c93c4b), accent_background (선택 배경, 기본 #fff0f2), accent_border (선택 테두리, 기본 #e77a87).
+잘못된 색상/크기는 무시하고 기본값을 유지합니다. 기존 Apps Script는 변경하지 않아도 됩니다. 시트 툴바의 색/글꼴/굵기 변경은 자동으로 읽지 않습니다.
+
+주의사항 notice는 비어 있지 않은 줄마다 ●과 구분선으로 나뉩니다. 협업작가 note는 기본 본문 크기/색상을 따릅니다. 프로필 이미지는 profile_image의 value에 로그인 없이 이미지 자체가 열리는 전체 URL을 입력합니다. public/profile.png를 배포했다면 https://warm-squirrel-5cfab5.netlify.app/profile.png 를 사용합니다.
+
+## 월 단위 날짜와 카드 그라데이션
+작품 날짜는 `2026년 11월` 형식으로 입력합니다. 기존 `2026년 11월 08일` 값도 화면에서는 끝의 일자를 제거해 `2026년 11월`로 표시합니다. 날짜 구분선은 표시된 문자열 너비보다 0.8em만 길게 자동 조정됩니다. 영상/GIF 프레임은 그대로 두고 텍스트 카드와 컨트롤 카드에는 상단의 연한 강조색이 아래의 흰색으로 사라지는 그라데이션을 적용합니다. 섹션 제목 하단 선에는 accent_border 색상을 사용합니다.
