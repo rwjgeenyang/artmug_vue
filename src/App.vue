@@ -94,9 +94,10 @@ function youtubeEmbed(value) {
 const categories = [
   { type: "broadcast", label: "방송화면 및 대기화면", number: "04" },
   { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼", number: "05" },
-  { type: "ingame", label: "인게임", number: "06" },
+  { type: "cover", label: "커버곡", number: "06" },
+  { type: "ingame", label: "인게임", number: "07" },
 ];
-const selectedMedia = ref({ broadcast: "gif", wallpaper: "gif", ingame: "gif" });
+const selectedMedia = ref({ broadcast: "gif", wallpaper: "gif", cover: "gif", ingame: "gif" });
 const mediaSections = computed(() => categories.map(category => {
   const works = new Map();
   const ensure = number => {
@@ -230,17 +231,17 @@ onMounted(load);
       </div>
     </section>
     <section class="section" aria-labelledby="collaborators-heading">
-      <header class="section-heading"><span class="number">07</span><h2 id="collaborators-heading">협업작가</h2></header>
+      <header class="section-heading"><span class="number">08</span><h2 id="collaborators-heading">협업작가</h2></header>
       <div class="collaborators-list">
         <CollaboratorCard v-for="artist in collaborators" :key="artist.id" :artist="artist" />
       </div>
     </section>
     <section class="section" aria-labelledby="application-heading">
-      <header class="section-heading"><span class="number">08</span><h2 id="application-heading">신청양식</h2></header>
+      <header class="section-heading"><span class="number">09</span><h2 id="application-heading">신청양식</h2></header>
       <ApplicationForm :fields="applicationFields" />
     </section>
     <section class="section" aria-labelledby="notice-heading">
-      <header class="section-heading"><span class="number">09</span><h2 id="notice-heading">주의사항</h2></header>
+      <header class="section-heading"><span class="number">10</span><h2 id="notice-heading">주의사항</h2></header>
       <div class="information-card">
         <ul class="notice-list" :style="{ fontSize: '18px', ...styleFor('notice') }">
           <li v-for="(line, index) in noticeLines" :key="index" :style="index === noticeLines.length - 1 ? { color: noticeLastColor } : undefined"><span class="notice-bullet" aria-hidden="true">●</span><span>{{ line }}</span></li>

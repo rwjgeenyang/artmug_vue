@@ -1,6 +1,6 @@
 # 작품 카테고리와 표시 형식
 
-세 카테고리의 우측 상단 GIF / YOUTUBE 버튼은 각각 독립적으로 전환됩니다. 기본 선택은 GIF이며, YOUTUBE는 유튜브 플레이어를 표시합니다. 형식을 바꾸면 이전 영상 재생이 중지되고 첫 번째 작품부터 표시됩니다.
+네 카테고리의 우측 상단 GIF / YOUTUBE 버튼은 각각 독립적으로 전환됩니다. 기본 선택은 GIF이며, YOUTUBE는 유튜브 플레이어를 표시합니다. 형식을 바꾸면 이전 영상 재생이 중지되고 같은 작품 번호를 유지합니다.
 
 Google Sheets DATA 시트의 type과 value를 사용합니다.
 
@@ -8,6 +8,7 @@ Google Sheets DATA 시트의 type과 value를 사용합니다.
 | --- | --- | --- |
 | 방송화면 및 대기화면 | broadcast_gif | broadcast_youtube |
 | 월페이퍼 및 반응형 월페이퍼 | wallpaper_gif | wallpaper_youtube |
+| 커버곡 | cover_gif | cover_youtube |
 | 인게임 | ingame_gif | ingame_youtube |
 
 value에는 GIF 이미지 URL 또는 YouTube 영상 URL을 입력합니다. 같은 type의 행을 추가하면 좌우 화살표로 넘길 수 있습니다.
@@ -121,3 +122,19 @@ form_3_title 등으로 항목을 추가합니다. 제목이 비어 있는 항목
 
 ## 아트머그 호스트 페이지
 이 사이트의 코드만으로 다른 출처인 아트머그 부모 페이지의 ‘더보기’ 버튼을 제거할 수는 없습니다. 아트머그 편집기에서 지원하는 설정/삽입 방법을 별도로 확인해야 합니다.
+
+
+## 커버곡
+월페이퍼와 인게임 사이에 06 커버곡이 표시됩니다. 인게임 07, 협업작가 08, 신청양식 09, 주의사항 10 순서입니다.
+DATA 시트는 다른 카테고리와 동일하게 작품 번호별 type/value를 사용합니다.
+
+| type | value 예시 |
+| --- | --- |
+| cover_1_gif | https://warm-squirrel-5cfab5.netlify.app/gif/만월땅님.gif |
+| cover_1_youtube | 유튜브 영상 주소 |
+| cover_1_description | 작품 설명 |
+| cover_1_date | 2026년 11월 |
+
+두 번째 작품은 cover_2_gif, cover_2_youtube, cover_2_description, cover_2_date로 추가합니다. cover_1만 단독으로 입력하지 않고 용도에 맞는 접미사를 붙입니다. GIF/YOUTUBE 전환, 같은 작품 번호 유지, 좌우 버튼/드래그, 준비 중 문구 및 미리 불러오기는 다른 카테고리와 같습니다.
+
+이번에 새로 업로드된 public/gif/ 아래 GIF 12개는 현재 위치와 파일명을 그대로 배포합니다. 시트 셀의 URL은 파일 이동 시 자동으로 변경되지 않습니다. 이미 /gif/파일명.gif를 썼다면 변경할 필요가 없고, /파일명.gif처럼 예전 루트 경로를 사용했다면 새 파일명과 /gif/ 경로로 직접 바꿔야 합니다. URL에는 public/을 넣지 않습니다.
