@@ -50,7 +50,10 @@ function keyboard(event) {
 
 <template>
   <div class="carousel" role="region" aria-roledescription="슬라이더" :aria-label="label" tabindex="0" @keydown="keyboard">
-    <div class="information-card work-description"><p>{{ current.description || '작품 설명을 준비 중입니다···' }}</p></div>
+    <div class="information-card work-description">
+      <div v-if="current.date" class="work-date" :style="current.dateStyle">{{ current.date }}</div>
+      <p :style="current.descriptionStyle">{{ current.description || '작품 설명을 준비 중입니다···' }}</p>
+    </div>
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
         <MediaFrame :src="current[kind]" :kind="kind" :label="label + ' ' + current.number" />
@@ -65,6 +68,7 @@ function keyboard(event) {
 </template>
 
 <style scoped>
+.work-date { width: fit-content; max-width: 100%; padding: 0 .8em 12px 0; border-bottom: 1px solid #d5d8dd; margin-bottom: 16px; color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .carousel { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 .carousel:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }
 .carousel-controls { align-self: center; display: flex; align-items: center; gap: 16px; padding: 8px 12px; border: 1px solid #e3e5e9; border-radius: 16px; background: #fff; box-shadow: 0 4px 16px #252b3510; }
