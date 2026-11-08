@@ -23,11 +23,19 @@ const pageStyle = computed(() => {
     '--accent-border': validColor(valueOf('accent_border')) || '#e77a87',
   };
 });
-const processSteps = computed(() => ['문의 및 상담', '자료 전달', '작업 진행', '수정 및 확인', '최종 전달'].map((fallback, index) => ({
-  number: index + 1,
-  title: valueOf('process_' + (index + 1)) || fallback,
-  revisions: valueOf('process_' + (index + 1) + '_revisions'),
-})));
+const processSteps = computed(() => {
+  const steps = new Map();
+  for (const item of items.value) {
+    const match = /^process_([1-9]\d*)$/.exec(item?.type || '');
+    if (!match) continue;
+    const number = Number(match[1]);
+    const title = String(item.value ?? '').trim();
+    if (title && !steps.has(number)) steps.set(number, {
+      number, title, revisions: valueOf('process_' + number + '_revisions'),
+    });
+  }
+  return [...steps.values()].sort((a, b) => a.number - b.number);
+});
 const processRevisions = computed(() => valueOf('process_revisions') || '수정 횟수를 입력해 주세요.');
 const name = computed(() => valueOf("name") || "작가 이름");
 const introduction = computed(() => valueOf("intro") || valueOf("text") || "자기소개가 들어갈 공간입니다.");
@@ -159,13 +167,14 @@ onMounted(load);
     <section class="section" aria-labelledby="process-heading">
       <header class="section-heading"><span class="number">03</span><h2 id="process-heading">작업 진행 방식</h2></header>
       <div class="information-card process-card">
-        <ol class="process-steps">
+        <ol v-if="processSteps.length" class="process-steps" :class="{ 'many-steps': processSteps.length > 6 }" :style="{ '--step-count': processSteps.length }">
           <li v-for="step in processSteps" :key="step.number" class="process-step">
             <span class="step-number">STEP {{ String(step.number).padStart(2, '0') }}</span>
             <p :style="styleFor('process_' + step.number)">{{ step.title }}</p>
             <p v-if="step.revisions" class="step-revisions" :style="styleFor('process_' + step.number + '_revisions')">{{ step.revisions }}</p>
           </li>
         </ol>
+        <p v-else>작업 진행 방식을 준비 중입니다···</p>
         <div class="revision-summary">
           <span class="revision-label">수정 횟수</span>
           <p :style="styleFor('process_revisions')">{{ processRevisions }}</p>
@@ -217,14 +226,15 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
 .page .section-heading { border-bottom-color: var(--accent-border); }
 .page .introduction, .page .information-card, .page .process-step,
 .page .carousel-controls, .page .media-switch, .page .revision-summary {
-  background: linear-gradient(180deg, var(--accent-background) 0, #fff 110px);
   border-color: var(--accent-border);
 }
 .page .intro-text, .page .job { color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); }
 .page .number { color: var(--accent-color); font-size: 16px; font-weight: 800; }
-.process-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 24px; list-style: none; padding: 0; margin: 0; }
+.process-steps { display: grid; grid-template-columns: repeat(var(--step-count), minmax(0, 1fr)); gap: 24px; list-style: none; padding: 0; margin: 0; }
 .process-step { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 18px 12px; border: 1px solid #e3e5e9; border-radius: 14px; background: #fafafa; text-align: center; }
 .process-step:not(:last-child)::after { content: '→'; position: absolute; right: -22px; top: 50%; transform: translateY(-50%); color: var(--accent-color); font-size: 18px; }
+.process-steps.many-steps { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+.process-steps.many-steps .process-step:not(:last-child)::after { content: '↓'; top: auto; bottom: -25px; right: 50%; transform: translateX(50%); }
 .step-number { color: var(--accent-color); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
 .step-revisions { padding: 5px 8px; border-radius: 8px; background: var(--accent-background); }
 .revision-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 16px 20px; border: 1px solid var(--accent-border); border-radius: 12px; background: var(--accent-background); }
