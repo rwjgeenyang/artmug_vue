@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import MediaFrame from './MediaFrame.vue';
 
 const props = defineProps({ works: { type: Array, default: () => [] }, kind: String, label: String });
@@ -8,15 +8,20 @@ const index = ref(0);
 const offset = ref(0);
 const dragging = ref(false);
 let gesture = null;
+const content = ref(null);
+let entryAnimation;
+onBeforeUnmount(() => entryAnimation?.cancel());
 watch(() => props.works.length, () => { index.value = Math.min(index.value, slides.value.length - 1); });
 const current = computed(() => slides.value[index.value]);
 const displayDate = computed(() => String(current.value.date || '').trim().replace(/\s*\d{1,2}일\s*$/, ''));
 function move(direction) {
+  entryAnimation?.cancel();
   const next = Math.max(0, Math.min(slides.value.length - 1, index.value + direction));
   index.value = next;
   offset.value = 0;
 }
 function down(event) {
+  entryAnimation?.cancel();
   if (!event.isPrimary || event.button !== 0 || event.target.closest('button, a, iframe')) return;
   gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, axis: null };
   event.currentTarget.setPointerCapture(event.pointerId);
@@ -35,7 +40,22 @@ function end(event, cancelled = false) {
   if (!gesture || gesture.id !== event.pointerId) return;
   const delta = event.clientX - gesture.x;
   const threshold = Math.min(80, event.currentTarget.clientWidth * 0.15);
-  if (!cancelled && gesture.axis === 'x' && Math.abs(delta) > threshold) move(delta < 0 ? 1 : -1);
+  if (!cancelled && gesture.axis === 'x' && Math.abs(delta) > threshold) {
+    const direction = delta < 0 ? 1 : -1;
+    const previous = index.value;
+    move(direction);
+    if (index.value !== previous) {
+      const selected = index.value;
+      const width = event.currentTarget.clientWidth;
+      nextTick(() => {
+        if (index.value !== selected || !content.value || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        entryAnimation = content.value.animate([
+          { transform: 'translateX(' + direction * width + 'px)' },
+          { transform: 'translateX(0)' },
+        ], { duration: 250, easing: 'ease-out' });
+      });
+    }
+  }
   gesture = null;
   dragging.value = false;
   offset.value = 0;
@@ -56,7 +76,7 @@ function keyboard(event) {
       <div v-if="displayDate" class="work-date" :style="{ fontSize: '18px', fontWeight: '700', ...current.dateStyle }">{{ displayDate }}</div>
     </div>
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
-      <div class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
+      <div ref="content" class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
         <MediaFrame :src="current[kind]" :kind="kind" :label="label + ' ' + current.number" />
       </div>
     </div>

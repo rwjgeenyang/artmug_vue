@@ -5,6 +5,7 @@ import { createMediaPreloader } from "./services/mediaPreload";
 import { getPageData } from "./services/sheetApi";
 import { connectEmbedHeight } from "./services/embedHeight";
 import MediaCarousel from "./components/MediaCarousel.vue";
+import ApplicationForm from "./components/ApplicationForm.vue";
 import CollaboratorCard from "./components/CollaboratorCard.vue";
 
 const items = ref([]);
@@ -48,7 +49,26 @@ const name = computed(() => valueOf("name") || "작가 이름");
 const introduction = computed(() => valueOf("intro") || valueOf("text") || "자기소개가 들어갈 공간입니다.");
 const about = computed(() => valueOf("about") || "소개글이 들어갈 공간입니다.");
 const notice = computed(() => valueOf("notice") || "주의사항이 들어갈 공간입니다.");
-const noticeLines = computed(() => String(notice.value).split(/\r?\n/).map(line => line.trim().replace(/^[●•]\s*/, '')).filter(Boolean));
+const noticeLines = computed(() => String(notice.value).split('^').map(line => line.trim().replace(/^[●•]\s*/, '')).filter(Boolean));
+const applicationFields = computed(() => {
+  const rows = items.value.filter(item => /^form_[1-9]\d*_(title|description|placeholder)$/.test(item?.type || ''));
+  const groups = new Map();
+  for (const row of rows) {
+    const [, id, field] = /^form_([1-9]\d*)_(title|description|placeholder)$/.exec(row.type);
+    if (!groups.has(id)) groups.set(id, { id });
+    if (groups.get(id)[field] === undefined) groups.get(id)[field] = String(row.value ?? '').trim();
+  }
+  const fields = rows.length ? [...groups.values()].filter(field => field.title) : [
+    { id: '1', title: '사용 목적', description: '방송용인지, 대기화면인지' },
+    { id: '2', title: '파츠분리 여부', description: 'psd 파일의 파츠 분리 여부' },
+  ];
+  return fields.sort((a, b) => Number(a.id) - Number(b.id)).map(field => ({
+    ...field,
+    titleStyle: styleFor('form_' + field.id + '_title'),
+    descriptionStyle: styleFor('form_' + field.id + '_description'),
+    textStyle: styleFor('form_' + field.id + '_text'),
+  }));
+});
 const profileImage = computed(() => safeUrl(valueOf("profile_image")));
 const profileFailed = ref(false);
 const job = computed(() => valueOf("job") || "");
@@ -177,14 +197,14 @@ onMounted(load);
         <ol v-if="processSteps.length" class="process-steps" :class="{ 'many-steps': processSteps.length > 6 }" :style="{ '--step-count': processSteps.length }">
           <li v-for="step in processSteps" :key="step.number" class="process-step">
             <span class="step-number">STEP {{ String(step.number).padStart(2, '0') }}</span>
-            <p :style="styleFor('process_' + step.number)">{{ step.title }}</p>
-            <p v-if="step.revisions" class="step-revisions" :style="styleFor('process_' + step.number + '_revisions')">{{ step.revisions }}</p>
+            <p :style="{ fontWeight: '700', ...styleFor('process_' + step.number) }">{{ step.title }}</p>
+            <p v-if="step.revisions" class="step-revisions" :style="{ fontWeight: '700', ...styleFor('process_' + step.number + '_revisions') }">{{ step.revisions }}</p>
           </li>
         </ol>
         <p v-else>작업 진행 방식을 준비 중입니다···</p>
         <div class="revision-summary">
           <span class="revision-label">수정 횟수</span>
-          <p :style="styleFor('process_revisions')">{{ processRevisions }}</p>
+          <p :style="{ fontWeight: '700', ...styleFor('process_revisions') }">{{ processRevisions }}</p>
         </div>
       </div>
     </section>
@@ -212,8 +232,12 @@ onMounted(load);
         <CollaboratorCard v-for="artist in collaborators" :key="artist.id" :artist="artist" />
       </div>
     </section>
+    <section class="section" aria-labelledby="application-heading">
+      <header class="section-heading"><span class="number">08</span><h2 id="application-heading">신청양식</h2></header>
+      <ApplicationForm :fields="applicationFields" />
+    </section>
     <section class="section" aria-labelledby="notice-heading">
-      <header class="section-heading"><span class="number">08</span><h2 id="notice-heading">주의사항</h2></header>
+      <header class="section-heading"><span class="number">09</span><h2 id="notice-heading">주의사항</h2></header>
       <div class="information-card">
         <ul class="notice-list" :style="styleFor('notice')">
           <li v-for="(line, index) in noticeLines" :key="index"><span class="notice-bullet" aria-hidden="true">●</span><span>{{ line }}</span></li>
@@ -236,17 +260,18 @@ onMounted(load);
 .page .intro-text, .page .job { color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); }
 .page .number { color: var(--accent-color); font-size: 16px; font-weight: 800; }
 .process-steps { display: grid; grid-template-columns: repeat(var(--step-count), minmax(0, 1fr)); gap: 24px; list-style: none; padding: 0; margin: 0; }
-.process-step { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 18px 12px; border: 1px solid #e3e5e9; border-radius: 14px; background: #fafafa; text-align: center; }
+.process-step { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px; gap: 12px; padding: 18px 12px; border: 1px solid #e3e5e9; border-radius: 14px; background: #fafafa; text-align: center; }
 .process-step:not(:last-child)::after { content: '→'; position: absolute; right: -22px; top: 50%; transform: translateY(-50%); color: var(--accent-color); font-size: 18px; }
 .process-steps.many-steps { grid-template-columns: minmax(0, 1fr); gap: 28px; }
 .process-steps.many-steps .process-step:not(:last-child)::after { content: '↓'; top: auto; bottom: -25px; right: 50%; transform: translateX(50%); }
 .step-number { color: var(--accent-color); font-size: 11px; font-weight: 700; letter-spacing: .04em; }
 .step-revisions { padding: 5px 8px; border-radius: 8px; background: var(--accent-background); }
-.revision-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 16px 20px; border: 1px solid var(--accent-border); border-radius: 12px; background: var(--accent-background); }
+.revision-summary { display: flex; justify-content: center; text-align: center; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 16px 20px; border: 1px solid var(--accent-border); border-radius: 12px; background: var(--accent-background); }
 .revision-label { color: var(--accent-color); font-size: 14px; font-weight: 700; }
 .notice-list { padding: 0; margin: 0; list-style: none; color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); line-height: 1.8; }
 .notice-list li { display: flex; align-items: baseline; gap: 10px; overflow-wrap: anywhere; }
 .notice-list li + li { border-top: 1px solid #e3e5e9; margin-top: 16px; padding-top: 16px; }
+.notice-list li > span:last-child { white-space: pre-wrap; }
 .notice-bullet { flex-shrink: 0; font-size: .65em; }
 @media (max-width: 720px) {
   .process-steps { grid-template-columns: minmax(0, 1fr); gap: 28px; }
