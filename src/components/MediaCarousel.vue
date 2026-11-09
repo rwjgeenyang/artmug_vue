@@ -72,6 +72,7 @@ function keyboard(event) {
 <template>
   <div class="carousel" role="region" aria-roledescription="슬라이더" :aria-label="label" tabindex="0" @keydown="keyboard">
     <div class="information-card work-description">
+      <div class="work-info-note">상세 정보는 유튜브를 확인해 주세요.</div>
       <p :style="{ fontSize: '18px', fontWeight: '700', ...current.descriptionStyle }">{{ pending ? '불러오는 중입니다...' : current.description || '작품 설명을 준비 중입니다···' }}</p>
       <div v-if="displayDate" class="work-date" :style="{ fontSize: '18px', fontWeight: '700', ...current.dateStyle }">{{ displayDate }}</div>
     </div>
@@ -89,6 +90,8 @@ function keyboard(event) {
 </template>
 
 <style scoped>
+.work-description { display: flex; flex-direction: column; align-items: stretch; }
+.work-info-note { align-self: flex-end; max-width: 100%; margin-bottom: 16px; padding: 5px 8px; border-radius: 8px; background: var(--accent-background); color: var(--text-color); font-size: var(--text-size); font-weight: 700; line-height: 1.6; overflow-wrap: anywhere; }
 .work-date { width: fit-content; max-width: 100%; padding: 12px .8em 0 0; border-top: 1px solid var(--accent-border); margin-top: 16px; color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .carousel { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 .carousel:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }

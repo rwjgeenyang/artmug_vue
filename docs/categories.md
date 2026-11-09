@@ -2,18 +2,19 @@
 
 네 카테고리의 우측 상단 GIF / YOUTUBE 버튼은 각각 독립적으로 전환됩니다. 기본 선택은 GIF이며, YOUTUBE는 유튜브 플레이어를 표시합니다. 형식을 바꾸면 이전 영상 재생이 중지되고 같은 작품 번호를 유지합니다.
 
-Google Sheets DATA 시트의 type과 value를 사용합니다.
+Google Sheets DATA 시트의 type과 value를 사용합니다. GIF와 YOUTUBE 모두 작품 번호를 명시해야 합니다.
 
-| 영역 | GIF type | YOUTUBE type |
+| 영역 | GIF type 예시 | YOUTUBE type 예시 |
 | --- | --- | --- |
-| 방송화면 및 대기화면 | broadcast_gif | broadcast_youtube |
-| 월페이퍼 및 반응형 월페이퍼 | wallpaper_gif | wallpaper_youtube |
-| 커버곡 | cover_gif | cover_youtube |
-| 인게임 | ingame_gif | ingame_youtube |
+| 방송화면 및 대기화면 | broadcast_1_gif | broadcast_1_youtube |
+| 월페이퍼 및 반응형 월페이퍼 | wallpaper_1_gif | wallpaper_1_youtube |
+| 커버곡 | cover_1_gif | cover_1_youtube |
+| 인게임 | ingame_1_gif | ingame_1_youtube |
 
-value에는 GIF 이미지 URL 또는 YouTube 영상 URL을 입력합니다. 같은 type의 행을 추가하면 좌우 화살표로 넘길 수 있습니다.
-
-기존 gif / youtube 행은 방송화면 및 대기화면에 유지됩니다. 기존 broadcast / wallpaper / ingame 행은 해당 카테고리의 YouTube 영상으로 계속 인식합니다. 미디어가 없는 형식에는 빈 카드가 표시됩니다.
+다음 작품은 번호를 2, 3…으로 바꿉니다. 같은 번호의 description/date/GIF/YOUTUBE가 한 작품입니다. 숫자 순으로 표시하며 시트 행 순서와 무관합니다.
+번호 없는 broadcast_gif, broadcast_youtube, gif, youtube, broadcast 등 기존 자동 순번 방식은 더 이상 읽지 않습니다. 기존 행의 type을 번호가 있는 형식으로 변경해야 합니다. 시트 자체의 행은 자동으로 변경하지 않습니다.
+카테고리 전체에 유효한 GIF 또는 YOUTUBE 주소가 하나도 없으면 해당 카테고리를 숨깁니다. description/date만 있는 카테고리도 숨깁니다. 한 형식만 등록한 카테고리는 표시하고, 비어 있는 형식에는 준비 중 안내를 표시합니다. 1번 없이 2번부터 등록해도 표시됩니다.
+작품 설명 카드 우측 상단에는 수정 횟수 안내와 같은 계열의 색상 박스로 ‘상세 정보는 유튜브를 확인해 주세요.’를 표시합니다.
 
 preview/categories.html을 다운로드해서 브라우저로 열면 실제 데이터 없이 배치와 전환 버튼을 확인할 수 있습니다.
 

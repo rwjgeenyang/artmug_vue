@@ -104,14 +104,6 @@ const mediaSections = computed(() => categories.map(category => {
     if (!works.has(number)) works.set(number, { number, gif: '', youtube: '', description: '', date: '' });
     return works.get(number);
   };
-  for (const kind of ['gif', 'youtube']) {
-    const legacy = items.value.filter(item => item?.type === category.type + '_' + kind ||
-      (kind === 'youtube' && item?.type === category.type) ||
-      (category.type === 'broadcast' && item?.type === kind));
-    legacy.forEach((item, index) => {
-      ensure(index + 1)[kind] = kind === 'gif' ? safeUrl(item.value) : youtubeEmbed(item.value);
-    });
-  }
   for (const item of items.value) {
     const match = new RegExp('^' + category.type + '_([1-9]\\d*)_(gif|youtube|description|date)$').exec(item?.type || '');
     if (!match) continue;
@@ -119,7 +111,7 @@ const mediaSections = computed(() => categories.map(category => {
     work[match[2]] = match[2] === 'gif' ? safeUrl(item.value) : match[2] === 'youtube' ? youtubeEmbed(item.value) : String(item.value ?? '');
   }
   return { ...category, works: [...works.values()].sort((a, b) => a.number - b.number).map(work => ({ ...work, dateStyle: styleFor(category.type + '_' + work.number + '_date'), descriptionStyle: styleFor(category.type + '_' + work.number + '_description') })) };
-}));
+}).filter(category => category.works.some(work => work.gif || work.youtube)));
 
 function artmugUrl(value) {
   try {
