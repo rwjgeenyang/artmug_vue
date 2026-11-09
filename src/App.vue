@@ -111,7 +111,7 @@ const mediaSections = computed(() => categories.map(category => {
     work[match[2]] = match[2] === 'gif' ? safeUrl(item.value) : match[2] === 'youtube' ? youtubeEmbed(item.value) : String(item.value ?? '');
   }
   return { ...category, works: [...works.values()].sort((a, b) => a.number - b.number).map(work => ({ ...work, dateStyle: styleFor(category.type + '_' + work.number + '_date'), descriptionStyle: styleFor(category.type + '_' + work.number + '_description') })) };
-}).filter(category => category.works.some(work => work.gif || work.youtube)));
+}).filter(category => category.type === 'broadcast' || category.works.some(work => work.gif || work.youtube)));
 
 function artmugUrl(value) {
   try {
