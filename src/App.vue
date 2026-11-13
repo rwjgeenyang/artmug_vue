@@ -92,10 +92,10 @@ function youtubeEmbed(value) {
   } catch { return ""; }
 }
 const categories = [
-  { type: "broadcast", label: "방송화면 및 대기화면", number: "04" },
-  { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼", number: "05" },
-  { type: "cover", label: "커버곡", number: "06" },
-  { type: "ingame", label: "인게임", number: "07" },
+  { type: "broadcast", label: "방송화면 및 대기화면" },
+  { type: "wallpaper", label: "월페이퍼 및 반응형 월페이퍼" },
+  { type: "cover", label: "커버곡" },
+  { type: "ingame", label: "인게임" },
 ];
 const selectedMedia = ref({ broadcast: "gif", wallpaper: "gif", cover: "gif", ingame: "gif" });
 const mediaSections = computed(() => categories.map(category => {
@@ -111,7 +111,7 @@ const mediaSections = computed(() => categories.map(category => {
     work[match[2]] = match[2] === 'gif' ? safeUrl(item.value) : match[2] === 'youtube' ? youtubeEmbed(item.value) : String(item.value ?? '');
   }
   return { ...category, works: [...works.values()].sort((a, b) => a.number - b.number).map(work => ({ ...work, dateStyle: styleFor(category.type + '_' + work.number + '_date'), descriptionStyle: styleFor(category.type + '_' + work.number + '_description') })) };
-}).filter(category => category.type === 'broadcast' || category.works.some(work => work.gif || work.youtube)));
+}).filter(category => category.type === 'broadcast' || category.works.some(work => work.gif || work.youtube)).map((category, index) => ({ ...category, number: String(index + 2).padStart(2, '0') })));
 
 function artmugUrl(value) {
   try {
@@ -171,8 +171,7 @@ onMounted(load);
       {{ error }} <button type="button" @click="load">다시 불러오기</button>
     </div>
 
-    <section class="section" aria-labelledby="intro-heading">
-      <header class="section-heading"><span class="number">01</span><h2 id="intro-heading">작가 소개</h2></header>
+    <section class="section" aria-label="작가 소개">
       <div class="introduction">
         <img v-if="profileImage && !profileFailed" class="profile-image" :src="profileImage" :alt="name + ' 프로필'" @error="profileFailed = true" />
         <div v-else class="profile-placeholder" aria-label="프로필 이미지 자리">PROFILE</div>
@@ -184,13 +183,12 @@ onMounted(load);
       </div>
     </section>
 
-    <section class="section" aria-labelledby="about-heading">
-      <header class="section-heading"><span class="number">02</span><h2 id="about-heading">소개글</h2></header>
+    <section class="section" aria-label="소개글">
       <div class="information-card"><p :style="styleFor('about')">{{ about }}</p></div>
     </section>
 
     <section class="section" aria-labelledby="process-heading">
-      <header class="section-heading"><span class="number">03</span><h2 id="process-heading">작업 진행 방식</h2></header>
+      <header class="section-heading"><span class="number">01</span><h2 id="process-heading">작업 진행 방식</h2></header>
       <div class="information-card process-card">
         <ol v-if="processSteps.length" class="process-steps" :class="{ 'many-steps': processSteps.length > 6 }" :style="{ '--step-count': processSteps.length }">
           <li v-for="step in processSteps" :key="step.number" class="process-step">
@@ -227,19 +225,19 @@ onMounted(load);
       </div>
     </section>
     <section class="section" aria-labelledby="collaborators-heading">
-      <header class="section-heading"><span class="number">08</span><h2 id="collaborators-heading">협업작가</h2></header>
+      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 2).padStart(2, '0') }}</span><h2 id="collaborators-heading">협업작가</h2></header>
       <div v-if="loading" class="information-card" role="status">불러오는 중입니다...</div>
       <div v-else class="collaborators-list">
         <CollaboratorCard v-for="artist in collaborators" :key="artist.id" :artist="artist" />
       </div>
     </section>
     <section class="section" aria-labelledby="application-heading">
-      <header class="section-heading"><span class="number">09</span><h2 id="application-heading">신청양식</h2></header>
+      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 3).padStart(2, '0') }}</span><h2 id="application-heading">신청양식</h2></header>
       <div v-if="loading" class="information-card" role="status">불러오는 중입니다...</div>
       <ApplicationForm v-else :fields="applicationFields" />
     </section>
     <section class="section" aria-labelledby="notice-heading">
-      <header class="section-heading"><span class="number">10</span><h2 id="notice-heading">주의사항</h2></header>
+      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 4).padStart(2, '0') }}</span><h2 id="notice-heading">주의사항</h2></header>
       <div class="information-card">
         <ul class="notice-list" :style="{ fontSize: '18px', ...styleFor('notice') }">
           <li v-for="(line, index) in noticeLines" :key="index" :style="index === noticeLines.length - 1 ? { color: noticeLastColor } : undefined"><span class="notice-bullet" aria-hidden="true">●</span><span>{{ line }}</span></li>

@@ -43,7 +43,7 @@ function errored(event) {
 </template>
 
 <style scoped>
-.media-frame { width: 100%; position: relative; display: grid; place-items: center; overflow: hidden; border-radius: 18px; background: #f5f6f8; }
+.media-frame { border: 1px solid #000; width: 100%; position: relative; display: grid; place-items: center; overflow: hidden; border-radius: 18px; background: #f5f6f8; }
 .media-message { margin: 0; padding: 24px; color: #747982; font-size: 13px; text-align: center; }
 img, iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; }
 img { object-fit: contain; pointer-events: none; }
