@@ -11,7 +11,7 @@ const copyText = computed(() => props.fields.map(field =>
   `[${field.title}]\n${answers.value[field.id] || ''}`
 ).join('\n\n'));
 const defaultStyle = { fontSize: '18px' };
-let toastTimer;
+let successTimer;
 let resizeFrame;
 let observer;
 
@@ -52,13 +52,13 @@ onMounted(() => {
 onBeforeUnmount(() => {
   observer?.disconnect();
   cancelAnimationFrame(resizeFrame);
-  clearTimeout(toastTimer);
+  clearTimeout(successTimer);
 });
 function success() {
   fallback.value = false;
   copied.value = true;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { copied.value = false; }, 2200);
+  clearTimeout(successTimer);
+  successTimer = setTimeout(() => { copied.value = false; }, 2000);
 }
 function legacyCopy(text) {
   const active = document.activeElement;
@@ -84,6 +84,8 @@ function legacyCopy(text) {
   }
 }
 async function copy() {
+  clearTimeout(successTimer);
+  copied.value = false;
   status.value = '';
   fallback.value = false;
   try {
@@ -110,14 +112,11 @@ function onInput() { status.value = ''; fallback.value = false; scheduleResize()
     </div>
     <p v-if="!fields.length">신청양식을 준비 중입니다···</p>
     <div v-else class="copy-actions">
-      <button type="button" @click="copy">복사하기</button>
+      <button type="button" :class="{ copied }" @click="copy"><span aria-live="polite">{{ copied ? '복사 완료!' : '복사하기' }}</span></button>
       <p v-if="status" role="status">{{ status }}</p>
     </div>
     <textarea v-if="fallback" class="copy-fallback" readonly :value="copyText"
       aria-label="복사할 신청양식" rows="8"></textarea>
-    <Transition name="copy-toast">
-      <div v-if="copied" class="copy-toast" role="status" aria-live="polite">복사 완료!</div>
-    </Transition>
   </div>
 </template>
 
@@ -130,10 +129,8 @@ textarea { display: block; box-sizing: border-box; width: 100%; min-height: 130p
 textarea:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
 textarea::placeholder { color: #747982; opacity: 1; }
 .copy-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.copy-actions button { margin: 0; padding: 12px 28px; border-color: var(--accent-border); background: var(--accent-background); color: var(--accent-color); font-size: 18px; font-weight: 700; transition: background .15s, color .15s; }
+.copy-actions button { min-width: 160px; margin: 0; padding: 12px 28px; border-color: var(--accent-border); background: var(--accent-background); color: var(--accent-color); font-size: 18px; font-weight: 700; transition: background .15s, color .15s; }
 .copy-actions button:active { background: #a82234; border-color: #a82234; color: #fff; }
-.copy-toast { position: fixed; z-index: 1000; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 14px 24px; border-radius: 12px; background: #16803d; color: #fff; font-size: 18px; font-weight: 700; box-shadow: 0 6px 24px #0002; pointer-events: none; white-space: nowrap; }
-.copy-toast-enter-active, .copy-toast-leave-active { transition: opacity .25s, transform .25s; }
-.copy-toast-enter-from, .copy-toast-leave-to { opacity: 0; transform: translate(-50%, 16px); }
-@media (prefers-reduced-motion: reduce) { .copy-toast-enter-active, .copy-toast-leave-active { transition: none; } }
+.copy-actions button.copied { background: #16803d; border-color: #16803d; color: #fff; }
+@media (prefers-reduced-motion: reduce) { .copy-actions button { transition: none; } }
 </style>
