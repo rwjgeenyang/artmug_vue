@@ -149,10 +149,14 @@ async function load() {
   error.value = "";
   try {
     items.value = await getPageData();
-    // Render the selected media first, then warm all other GIFs in the background.
+    // Prioritize the first GIF of each category and each collaborator card.
     await nextTick();
     const media = [...mediaSections.value.flatMap(section => section.works), ...collaborators.value];
-    preloader.preload(media.map(work => work.gif), media.some(work => work.youtube));
+    const firstGifs = [
+      ...mediaSections.value.map(section => section.works.find(work => work.gif)?.gif),
+      ...collaborators.value.map(artist => artist.gif),
+    ];
+    void preloader.preload(media.map(work => work.gif), media.some(work => work.youtube), firstGifs);
   }
   catch { error.value = "내용을 불러오지 못했습니다."; }
   finally { loading.value = false; }
