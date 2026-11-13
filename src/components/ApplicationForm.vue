@@ -112,7 +112,7 @@ function onInput() { status.value = ''; fallback.value = false; scheduleResize()
     </div>
     <p v-if="!fields.length">신청양식을 준비 중입니다···</p>
     <div v-else class="copy-actions">
-      <button type="button" :class="{ copied }" @click="copy"><span aria-live="polite">{{ copied ? '복사 완료!' : '복사하기' }}</span></button>
+      <button type="button" :class="{ copied }" @click="copy"><span aria-live="polite">{{ copied ? '복사완료!' : '복사하기' }}</span></button>
       <p v-if="status" role="status">{{ status }}</p>
     </div>
     <textarea v-if="fallback" class="copy-fallback" readonly :value="copyText"
