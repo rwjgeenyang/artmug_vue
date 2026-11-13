@@ -44,7 +44,7 @@ function errored(event) {
 
 <style scoped>
 .media-frame { width: 100%; position: relative; display: grid; place-items: center; overflow: hidden; border-radius: 18px; background: #f5f6f8; }
-.media-frame::after { content: ""; position: absolute; inset: 0; border: 2px solid #000; border-radius: inherit; pointer-events: none; z-index: 1; }
+.media-frame::after { content: ""; position: absolute; inset: 0; border: 1px solid #000; border-radius: inherit; pointer-events: none; z-index: 1; }
 .media-message { margin: 0; padding: 24px; color: #747982; font-size: 13px; text-align: center; }
 img, iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; border-radius: inherit; }
 img { object-fit: contain; pointer-events: none; }

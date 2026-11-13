@@ -26,9 +26,9 @@ const pageStyle = computed(() => {
     '--text-color': base.color || '#303238',
     '--text-size': base.fontSize || '15px',
     '--text-weight': '700',
-    '--accent-color': validColor(valueOf('accent_color')) || '#78648f',
-    '--accent-background': validColor(valueOf('accent_background')) || '#f0eaf8',
-    '--accent-border': validColor(valueOf('accent_border')) || '#dcd1e8',
+    '--accent-color': validColor(valueOf('accent_color')) || '#c93c4b',
+    '--accent-background': validColor(valueOf('accent_background')) || '#fff0f2',
+    '--accent-border': validColor(valueOf('accent_border')) || '#e77a87',
   };
 });
 const processSteps = computed(() => {
@@ -49,7 +49,7 @@ const name = computed(() => loading.value ? '불러오는 중입니다...' : val
 const introduction = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("intro") || valueOf("text") || "작가 소개가 들어갈 공간입니다.");
 const about = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("about") || "소개글이 들어갈 공간입니다.");
 const notice = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("notice") || "주의사항이 들어갈 공간입니다.");
-const noticeLastColor = computed(() => validColor(valueOf('notice_last_color')) || '#78648f');
+const noticeLastColor = computed(() => validColor(valueOf('notice_last_color')) || '#c93c4b');
 const noticeLines = computed(() => String(notice.value).split('^').map(line => line.trim().replace(/^[●•]\s*/, '')).filter(Boolean));
 const applicationFields = computed(() => {
   const rows = items.value.filter(item => /^form_[1-9]\d*_(title|description|placeholder)$/.test(item?.type || ''));
@@ -290,51 +290,5 @@ onMounted(load);
 @media (max-width: 560px) {
   .category-heading { display: grid; grid-template-columns: auto minmax(0, 1fr); }
   .category-heading .media-switch { grid-column: 2; justify-self: end; }
-}
-/* Pastel portfolio theme. Sheet text and accent settings remain configurable. */
-.page { --surface-line: #e7e2ed; --soft-shadow: 0 8px 28px #42365308; padding-top: 40px; padding-bottom: 64px; }
-.page .section + .section { margin-top: 44px; }
-.page .section-heading { border-bottom-color: var(--surface-line); padding-bottom: 18px; gap: 14px; }
-.page .section-heading h2 { letter-spacing: -.035em; }
-.page .number { display: grid; place-items: center; min-width: 36px; height: 36px; border-radius: 12px; background: var(--accent-background); color: var(--accent-color); font-size: 13px; letter-spacing: .04em; }
-.page .introduction { background: #f7f3fb; border-color: var(--surface-line); box-shadow: none; padding: 36px; border-radius: 24px; }
-.page .profile-image, .page .profile-placeholder { background: #fff; border: 5px solid #fff; box-shadow: 0 4px 18px #4236530a; }
-.page h1 { letter-spacing: -.045em; }
-.page .information-card { border-color: var(--surface-line); border-radius: 20px; box-shadow: var(--soft-shadow); }
-.page .process-steps { gap: 20px; }
-.page .process-step { background: #f3f0f9; border-color: #e8e1f1; border-radius: 18px; min-height: 158px; padding: 20px 12px; }
-.page .process-step:nth-child(2n) { background: #edf6f3; border-color: #dceae5; }
-.page .process-step:nth-child(3n) { background: #fff3ed; border-color: #f1e3db; }
-.page .process-step:not(:last-child)::after { right: -19px; color: #a99db6; }
-.page .step-number { letter-spacing: .1em; }
-.page .step-revisions { background: #ffffffb3; border: 1px solid #ffffff; border-radius: 7px; }
-.page .revision-summary { background: #faf8fc; border-color: var(--surface-line); border-radius: 14px; }
-.page .media-switch { background: #f5f2f8; border-color: var(--surface-line); border-radius: 14px; padding: 5px; }
-.page .media-switch button { border-radius: 9px; padding: 9px 15px; letter-spacing: .03em; }
-.page .media-switch button[aria-pressed="true"] { background: var(--accent-background); border-color: var(--accent-border); box-shadow: 0 2px 5px #42365308; }
-.page .work-description { background: #fcfbfd; box-shadow: none; }
-.page .work-info-note { border-radius: 10px; padding: 7px 12px; }
-.page .carousel { gap: 14px; }
-.page .carousel-surface { box-shadow: none; }
-.page .carousel-controls { border-color: var(--surface-line); background: #faf8fc; border-radius: 999px; padding: 7px 10px; box-shadow: none; }
-.page .carousel-controls button { border-color: #e4ddeb; color: #655675; }
-.page .carousel-controls button:not(:disabled):hover { background: var(--accent-background); }
-.page .application-field textarea { border-color: var(--surface-line); background: #fcfbfd; border-radius: 14px; }
-.page .application-field textarea::placeholder { color: #89818e; }
-.page .copy-actions button { padding: 14px 36px; border-radius: 14px; }
-.page .copy-actions button:active { background: var(--accent-color); border-color: var(--accent-color); color: #fff; }
-.page .notice-list li + li { border-top-color: var(--surface-line); }
-.page .notice-bullet { color: var(--accent-color); }
-.page .process-steps.many-steps { gap: 28px; }
-.page .process-steps.many-steps .process-step:not(:last-child)::after { right: 50%; }
-@media (max-width: 720px) {
-  .page .process-steps { gap: 28px; }
-  .page .process-step:not(:last-child)::after { right: 50%; }
-}
-@media (max-width: 560px) {
-  .page { padding-top: 24px; }
-  .page .introduction { padding: 24px; }
-  .page .section-heading h2 { font-size: 18px; }
-  .page .section + .section { margin-top: 34px; }
 }
 </style>
