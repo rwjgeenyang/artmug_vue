@@ -12,10 +12,10 @@ const prices = [
   { title: '비상업용', amount: '10만원' },
   { title: '방송용', amount: '15만원' },
   { title: '상업용', amount: '30만원' },
-  { title: '눈 깜빡임', amount: '2만원', note: '리뷰 작성 약속 시 무료!', promotion: true },
+  { title: '눈 깜빡임', amount: '2만원', note: '리뷰 작성 약속 시 무료!' },
   { title: '추가 액팅', amount: '개당 5만원', note: '기본 IDLE 제외 추가 모션' },
   { title: '반응형 월페이퍼', amount: '개당 6만원', note: '메모리얼, 터치, 볼 당기기 등' },
-  { title: '파츠 분리', amount: '시작가 15만원', note: '그림의 복잡도에 따라 가격이 달라질 수 있습니다.' },
+  { title: '파츠 분리', amount: '시작가 15만원', note: '※ 그림의 복잡도에 따라 가격이 달라질 수 있습니다.' },
 ];
 const items = ref([]);
 const loading = ref(true);
@@ -249,7 +249,7 @@ onMounted(load);
             <tr v-for="price in prices" :key="price.title">
               <th scope="row">
                 <span>{{ price.title }}</span>
-                <span v-if="price.note" class="price-note" :class="{ 'price-promotion': price.promotion }">{{ price.note }}</span>
+                <span v-if="price.note" class="price-note">{{ price.note }}</span>
               </th>
               <td>{{ price.amount }}</td>
             </tr>
@@ -326,7 +326,6 @@ onMounted(load);
 .price-table td, .price-table thead th:last-child { text-align: right; white-space: nowrap; }
 .price-table td { color: var(--accent-color); }
 .price-note { display: block; margin-top: 6px; color: #626772; font-size: 16px; }
-.price-promotion { color: var(--accent-color); }
 @media (max-width: 560px) {
   .price-table th, .price-table td { padding: 18px 14px; }
   .price-table { font-size: 16px; }
