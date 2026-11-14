@@ -8,6 +8,15 @@ import MediaCarousel from "./components/MediaCarousel.vue";
 import ApplicationForm from "./components/ApplicationForm.vue";
 import CollaboratorCard from "./components/CollaboratorCard.vue";
 
+const prices = [
+  { title: '비상업용', amount: '10만원' },
+  { title: '방송용', amount: '15만원' },
+  { title: '상업용', amount: '30만원' },
+  { title: '눈 깜빡임', amount: '2만원', note: '리뷰 작성 약속 시 무료!', promotion: true },
+  { title: '추가 액팅', amount: '개당 5만원', note: '기본 IDLE 제외 추가 모션' },
+  { title: '반응형 월페이퍼', amount: '개당 6만원', note: '메모리얼, 터치, 볼 당기기 등' },
+  { title: '파츠 분리', amount: '시작가 15만원', note: '그림의 복잡도에 따라 가격이 달라질 수 있습니다.' },
+];
 const items = ref([]);
 const loading = ref(true);
 const error = ref("");
@@ -231,13 +240,30 @@ onMounted(load);
         <CollaboratorCard v-for="artist in collaborators" :key="artist.id" :artist="artist" />
       </div>
     </section>
+    <section class="section" aria-labelledby="pricing-heading">
+      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 3).padStart(2, '0') }}</span><h2 id="pricing-heading">가격 안내</h2></header>
+      <div class="information-card pricing-card">
+        <table class="price-table" aria-labelledby="pricing-heading">
+          <thead><tr><th scope="col">항목</th><th scope="col">가격</th></tr></thead>
+          <tbody>
+            <tr v-for="price in prices" :key="price.title">
+              <th scope="row">
+                <span>{{ price.title }}</span>
+                <span v-if="price.note" class="price-note" :class="{ 'price-promotion': price.promotion }">{{ price.note }}</span>
+              </th>
+              <td>{{ price.amount }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
     <section class="section" aria-labelledby="application-heading">
-      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 3).padStart(2, '0') }}</span><h2 id="application-heading">신청양식</h2></header>
+      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 4).padStart(2, '0') }}</span><h2 id="application-heading">신청양식</h2></header>
       <div v-if="loading" class="information-card" role="status">불러오는 중입니다...</div>
       <ApplicationForm v-else :fields="applicationFields" />
     </section>
     <section class="section" aria-labelledby="notice-heading">
-      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 4).padStart(2, '0') }}</span><h2 id="notice-heading">주의사항</h2></header>
+      <header class="section-heading"><span class="number">{{ String(mediaSections.length + 5).padStart(2, '0') }}</span><h2 id="notice-heading">주의사항</h2></header>
       <div class="information-card">
         <ul class="notice-list" :style="{ fontSize: '18px', ...styleFor('notice') }">
           <li v-for="(line, index) in noticeLines" :key="index" :style="index === noticeLines.length - 1 ? { color: noticeLastColor } : undefined"><span class="notice-bullet" aria-hidden="true">●</span><span>{{ line }}</span></li>
@@ -290,5 +316,20 @@ onMounted(load);
 @media (max-width: 560px) {
   .category-heading { display: grid; grid-template-columns: auto minmax(0, 1fr); }
   .category-heading .media-switch { grid-column: 2; justify-self: end; }
+}
+.page .pricing-card { padding: 0; overflow: hidden; }
+.price-table { width: 100%; border-collapse: collapse; font-size: 18px; line-height: 1.6; }
+.price-table th, .price-table td { padding: 22px 28px; text-align: left; vertical-align: middle; }
+.price-table thead { background: var(--accent-background); color: var(--accent-color); }
+.price-table tbody tr + tr { border-top: 1px solid #e3e5e9; }
+.price-table th[scope="row"] { overflow-wrap: anywhere; }
+.price-table td, .price-table thead th:last-child { text-align: right; white-space: nowrap; }
+.price-table td { color: var(--accent-color); }
+.price-note { display: block; margin-top: 6px; color: #626772; font-size: 16px; }
+.price-promotion { color: var(--accent-color); }
+@media (max-width: 560px) {
+  .price-table th, .price-table td { padding: 18px 14px; }
+  .price-table { font-size: 16px; }
+  .price-note { font-size: 14px; }
 }
 </style>
