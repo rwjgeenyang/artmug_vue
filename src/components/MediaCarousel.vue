@@ -13,6 +13,10 @@ let entryAnimation;
 onBeforeUnmount(() => entryAnimation?.cancel());
 watch(() => props.works.length, () => { index.value = Math.min(index.value, slides.value.length - 1); });
 const current = computed(() => slides.value[index.value]);
+const selectedVariants = ref({});
+const gifVariants = computed(() => current.value.gifVariants || []);
+const selectedGif = computed(() => gifVariants.value.find(gif => gif.label === selectedVariants.value[current.value.number]) || gifVariants.value[0]);
+const mediaSource = computed(() => props.kind === 'gif' ? selectedGif.value?.src || current.value.gif : current.value.youtube);
 const displayDate = computed(() => String(current.value.date || '').trim().replace(/\s*\d{1,2}일\s*$/, ''));
 function move(direction) {
   entryAnimation?.cancel();
@@ -74,13 +78,17 @@ function keyboard(event) {
     <div class="information-card work-description">
       <div class="work-description-row">
       <p :style="{ fontSize: '18px', fontWeight: '700', ...current.descriptionStyle }">{{ pending ? '불러오는 중입니다...' : current.description || '작품 설명을 준비 중입니다···' }}</p>
-      <div class="work-info-note">상세 정보는 유튜브를 확인해 주세요.</div>
+      <div v-if="kind === 'gif' && gifVariants.length" class="gif-variants" role="group" aria-label="인게임 모션 선택">
+        <button v-for="gif in gifVariants" :key="gif.label" type="button"
+          :aria-pressed="selectedGif?.label === gif.label"
+          @click="selectedVariants[current.number] = gif.label">{{ gif.label }}</button>
+      </div>
       </div>
       <div v-if="displayDate" class="work-date" :style="{ fontSize: '18px', fontWeight: '700', ...current.dateStyle }">{{ displayDate }}</div>
     </div>
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div ref="content" class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
-        <MediaFrame :pending="pending" :src="current[kind]" :kind="kind" :label="label + ' ' + current.number" />
+        <MediaFrame :pending="pending" :src="mediaSource" :kind="kind" :label="label + ' ' + current.number" />
       </div>
     </div>
     <div v-if="works.length" class="carousel-controls" :aria-label="label + ' 탐색'">
@@ -95,7 +103,14 @@ function keyboard(event) {
 .work-description { display: flex; flex-direction: column; align-items: stretch; }
 .work-description-row { display: flex; align-items: flex-start; gap: 16px; }
 .work-description-row > p { flex: 1; min-width: 0; }
-.work-info-note { flex: 0 1 auto; max-width: 45%; padding: 5px 8px; border-radius: 8px; background: var(--accent-background); color: var(--text-color); font-size: var(--text-size); font-weight: 700; line-height: 1.6; overflow-wrap: anywhere; }
+.gif-variants { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 55%; flex: 0 1 auto; }
+.gif-variants button { margin: 0; padding: 6px 10px; border: 1px solid #d5d8dd; border-radius: 8px; background: #fff; color: var(--text-color); font-size: 15px; overflow-wrap: anywhere; max-width: 100%; }
+.gif-variants button[aria-pressed="true"] { border-color: var(--accent-border); background: var(--accent-background); color: var(--accent-color); }
+@media (max-width: 560px) {
+  .work-description-row { flex-wrap: wrap; }
+  .work-description-row > p { flex-basis: 100%; }
+  .gif-variants { max-width: 100%; margin-left: auto; }
+}
 .work-date { width: fit-content; max-width: 100%; padding: 12px .8em 0 0; border-top: 1px solid var(--accent-border); margin-top: 16px; color: var(--text-color); font-size: var(--text-size); font-weight: var(--text-weight); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .carousel { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
 .carousel:focus-visible { outline: 2px solid #707b8f; outline-offset: 4px; }

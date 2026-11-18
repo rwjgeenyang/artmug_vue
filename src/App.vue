@@ -110,14 +110,27 @@ const selectedMedia = ref({ broadcast: "gif", wallpaper: "gif", cover: "gif", in
 const mediaSections = computed(() => categories.map(category => {
   const works = new Map();
   const ensure = number => {
-    if (!works.has(number)) works.set(number, { number, gif: '', youtube: '', description: '', date: '' });
+    if (!works.has(number)) works.set(number, { number, gif: '', gifVariants: [], youtube: '', description: '', date: '' });
     return works.get(number);
   };
   for (const item of items.value) {
+    const variant = category.type === 'ingame' && /^ingame_([1-9]\d*)_gif_(.+)$/.exec(item?.type || '');
+    if (variant) {
+      const src = safeUrl(item.value);
+      const label = variant[2].trim();
+      if (src && label) {
+        const work = ensure(Number(variant[1]));
+        if (!work.gifVariants.some(gif => gif.label === label)) work.gifVariants.push({ label, src });
+      }
+      continue;
+    }
     const match = new RegExp('^' + category.type + '_([1-9]\\d*)_(gif|youtube|description|date)$').exec(item?.type || '');
     if (!match) continue;
     const work = ensure(Number(match[1]));
     work[match[2]] = match[2] === 'gif' ? safeUrl(item.value) : match[2] === 'youtube' ? youtubeEmbed(item.value) : String(item.value ?? '');
+  }
+  for (const work of works.values()) {
+    if (work.gifVariants.length) work.gif = work.gifVariants[0].src;
   }
   return { ...category, works: [...works.values()].sort((a, b) => a.number - b.number).map(work => ({ ...work, dateStyle: styleFor(category.type + '_' + work.number + '_date'), descriptionStyle: styleFor(category.type + '_' + work.number + '_description') })) };
 }).filter(category => category.type === 'broadcast' || category.works.some(work => work.gif || work.youtube)).map((category, index) => ({ ...category, number: String(index + 2).padStart(2, '0') })));
@@ -165,7 +178,7 @@ async function load() {
       ...mediaSections.value.map(section => section.works.find(work => work.gif)?.gif),
       ...collaborators.value.map(artist => artist.gif),
     ];
-    void preloader.preload(media.map(work => work.gif), media.some(work => work.youtube), firstGifs);
+    void preloader.preload(media.flatMap(work => [work.gif, ...(work.gifVariants || []).map(gif => gif.src)]), media.some(work => work.youtube), firstGifs);
   }
   catch { error.value = "내용을 불러오지 못했습니다."; }
   finally { loading.value = false; }
