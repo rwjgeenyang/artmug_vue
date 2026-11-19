@@ -130,7 +130,6 @@ textarea:focus-visible { outline: 2px solid var(--accent-color); outline-offset:
 textarea::placeholder { color: #747982; opacity: 1; }
 .copy-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .copy-actions button { min-width: 160px; margin: 0; padding: 12px 28px; border-color: var(--accent-border); background: var(--accent-background); color: var(--accent-color); font-size: 18px; font-weight: 700; transition: background .15s, color .15s; }
-.copy-actions button:active { background: #a82234; border-color: #a82234; color: #fff; }
 .copy-actions button.copied { background: #16803d; border-color: #16803d; color: #fff; }
 @media (prefers-reduced-motion: reduce) { .copy-actions button { transition: none; } }
 </style>
