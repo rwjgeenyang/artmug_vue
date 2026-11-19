@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
+defineOptions({ inheritAttrs: false });
 const props = defineProps({ src: String, kind: String, label: String, lazy: Boolean, pending: Boolean });
 // Keep the last loaded GIF's proportions until the next image has dimensions.
 const ratio = ref(16 / 9);
@@ -59,7 +60,7 @@ function errored(event) {
 </script>
 
 <template>
-  <div ref="trigger" class="media-frame" :class="{ expandable: canExpand }"
+  <div ref="trigger" v-bind="$attrs" class="media-frame" :class="{ expandable: canExpand }"
     :role="kind === 'gif' ? 'button' : undefined" :tabindex="canExpand ? 0 : undefined"
     :aria-label="kind === 'gif' ? label + ' GIF 크게 보기' : undefined"
     @click="openViewer" @keydown.enter.prevent="openViewer" @keydown.space.prevent="openViewer"
