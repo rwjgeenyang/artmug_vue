@@ -8,6 +8,10 @@ const index = ref(0);
 const offset = ref(0);
 const dragging = ref(false);
 let gesture = null;
+let suppressClick = false;
+function clickCapture(event) {
+  if (suppressClick) { event.preventDefault(); event.stopPropagation(); suppressClick = false; }
+}
 const content = ref(null);
 let entryAnimation;
 onBeforeUnmount(() => entryAnimation?.cancel());
@@ -27,8 +31,8 @@ function move(direction) {
 function down(event) {
   entryAnimation?.cancel();
   if (!event.isPrimary || event.button !== 0 || event.target.closest('button, a, iframe')) return;
+  suppressClick = false;
   gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, axis: null };
-  event.currentTarget.setPointerCapture(event.pointerId);
 }
 function drag(event) {
   if (!gesture || gesture.id !== event.pointerId) return;
@@ -36,12 +40,14 @@ function drag(event) {
   const dy = event.clientY - gesture.y;
   if (!gesture.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8) gesture.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
   if (gesture.axis !== 'x') return;
+  event.currentTarget.setPointerCapture(event.pointerId);
   dragging.value = true;
   const edge = (index.value === 0 && dx > 0) || (index.value === slides.value.length - 1 && dx < 0);
   offset.value = dx * (edge ? 0.18 : 1);
 }
 function end(event, cancelled = false) {
   if (!gesture || gesture.id !== event.pointerId) return;
+  suppressClick = Boolean(gesture.axis);
   const delta = event.clientX - gesture.x;
   const threshold = Math.min(80, event.currentTarget.clientWidth * 0.15);
   if (!cancelled && gesture.axis === 'x' && Math.abs(delta) > threshold) {
@@ -86,7 +92,7 @@ function keyboard(event) {
       </div>
       <div v-if="displayDate" class="work-date" :style="{ fontSize: '18px', fontWeight: '700', ...current.dateStyle }">{{ displayDate }}</div>
     </div>
-    <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
+    <div class="carousel-surface" :class="{ dragging }" @click.capture="clickCapture" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div ref="content" class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
         <MediaFrame :pending="pending" :src="mediaSource" :kind="kind" :label="label + ' ' + current.number" />
       </div>
