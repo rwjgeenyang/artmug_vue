@@ -1,4 +1,5 @@
 <script setup>
+import "./studio.css";
 import { computed, onMounted, onBeforeUnmount, nextTick, ref } from "vue";
 import { textStyle, validColor } from "./services/textStyle";
 import { createMediaPreloader } from "./services/mediaPreload";
@@ -33,7 +34,7 @@ const pageStyle = computed(() => {
   const base = styleFor('text');
   return {
     '--text-color': base.color || '#303238',
-    '--text-size': base.fontSize || '15px',
+    '--text-size': base.fontSize || '18px',
     '--text-weight': '700',
     '--accent-color': validColor(valueOf('accent_color')) || '#c93c4b',
     '--accent-background': validColor(valueOf('accent_background')) || '#fff0f2',
@@ -135,6 +136,8 @@ const mediaSections = computed(() => categories.map(category => {
   return { ...category, works: [...works.values()].sort((a, b) => a.number - b.number).map(work => ({ ...work, dateStyle: styleFor(category.type + '_' + work.number + '_date'), descriptionStyle: styleFor(category.type + '_' + work.number + '_description') })) };
 }).filter(category => category.type === 'broadcast' || category.works.some(work => work.gif || work.youtube)).map((category, index) => ({ ...category, number: String(index + 2).padStart(2, '0') })));
 
+const featuredGif = computed(() => mediaSections.value.flatMap(section => section.works).find(work => work.gif)?.gif || '');
+
 function artmugUrl(value) {
   try {
     const url = new URL(String(value));
@@ -187,13 +190,18 @@ onMounted(load);
 </script>
 
 <template>
-  <main class="page" ref="pageElement" :style="pageStyle">
+  <main class="page studio-design" ref="pageElement" :style="pageStyle">
     <p v-if="loading" class="status" role="status">불러오는 중입니다...</p>
     <div v-if="error" class="status" role="alert">
       {{ error }} <button type="button" @click="load">다시 불러오기</button>
     </div>
 
-    <section class="section" aria-label="작가 소개">
+    <div class="studio-masthead">
+      <span class="studio-wordmark">ANIMATION PORTFOLIO</span>
+      <nav aria-label="주요 안내"><a href="#pricing-heading">가격 안내</a><a href="#application-heading">신청양식</a></nav>
+    </div>
+    <section class="section studio-hero" aria-label="작가 소개">
+      <p class="studio-kicker">SPINE 2D · COMMISSION</p>
       <div class="introduction">
         <img v-if="profileImage && !profileFailed" class="profile-image" :src="profileImage" :alt="name + ' 프로필'" @error="profileFailed = true" />
         <div v-else class="profile-placeholder" aria-label="프로필 이미지 자리">PROFILE</div>
@@ -201,15 +209,20 @@ onMounted(load);
           <h1 :style="styleFor('name')">{{ name }}</h1>
           <p v-if="job" class="job" :style="styleFor('job')">{{ job }}</p>
           <p class="intro-text" :style="styleFor(valueOf('intro') ? 'intro' : 'text')">{{ introduction }}</p>
+          <div class="studio-actions"><a class="studio-primary" href="#application-heading">커미션 신청양식</a><a href="#broadcast-heading">작업물 보기</a></div>
         </div>
       </div>
+      <figure v-if="featuredGif" class="studio-featured">
+        <img :src="featuredGif" :alt="name + ' 대표 작업 미리보기'" fetchpriority="high" />
+        <figcaption><span>FEATURED WORK</span><a href="#broadcast-heading">전체 작업물 보기</a></figcaption>
+      </figure>
     </section>
 
-    <section class="section" aria-label="소개글">
+    <section class="section studio-about" aria-label="소개글">
       <div class="information-card"><p :style="styleFor('about')">{{ about }}</p></div>
     </section>
 
-    <section class="section" aria-labelledby="process-heading">
+    <section class="section studio-process" aria-labelledby="process-heading">
       <header class="section-heading"><span class="number">01</span><h2 id="process-heading">작업 진행 방식</h2></header>
       <div class="information-card process-card">
         <ol v-if="processSteps.length" class="process-steps" :class="{ 'many-steps': processSteps.length > 6 }" :style="{ '--step-count': processSteps.length }">
@@ -229,7 +242,7 @@ onMounted(load);
       </div>
     </section>
 
-    <section v-for="category in mediaSections" :key="category.type" class="section" :aria-labelledby="category.type + '-heading'">
+    <section v-for="category in mediaSections" :key="category.type" class="section studio-work" :aria-labelledby="category.type + '-heading'">
       <header class="section-heading category-heading">
         <span class="number">{{ category.number }}</span>
         <h2 :id="category.type + '-heading'">{{ category.label }}</h2>
@@ -283,6 +296,7 @@ onMounted(load);
         </ul>
       </div>
     </section>
+    <footer class="studio-footer"><span>{{ name }}</span><span>SPINE 2D · ANIMATION PORTFOLIO</span><a href="#application-heading">신청양식 보기</a></footer>
   </main>
 </template>
 
