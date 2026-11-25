@@ -186,15 +186,6 @@ async function load() {
   catch { error.value = "내용을 불러오지 못했습니다."; }
   finally { loading.value = false; }
 }
-function scrollToSection(id) {
-  const target = document.getElementById(id);
-  if (!target) return;
-  target.scrollIntoView({
-    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-    block: 'start',
-    inline: 'nearest',
-  });
-}
 onMounted(load);
 </script>
 
@@ -217,12 +208,11 @@ onMounted(load);
           <h1 :style="styleFor('name')">{{ name }}</h1>
           <p v-if="job" class="job" :style="styleFor('job')">{{ job }}</p>
           <p class="intro-text" :style="styleFor(valueOf('intro') ? 'intro' : 'text')">{{ introduction }}</p>
-          <div class="studio-actions"><a class="studio-primary" href="#application-heading" @click.prevent="scrollToSection('application-heading')">커미션 신청양식</a><a href="#broadcast-heading" @click.prevent="scrollToSection('broadcast-heading')">작업물 보기</a></div>
         </div>
       </div>
       <figure v-if="featuredGif" class="studio-featured">
         <img :src="featuredGif" :alt="name + ' 대표 작업 미리보기'" fetchpriority="high" />
-        <figcaption><span>FEATURED WORK</span></figcaption>
+        <figcaption><span>주요 작품</span></figcaption>
       </figure>
     </section>
 
