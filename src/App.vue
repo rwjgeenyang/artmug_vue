@@ -136,7 +136,7 @@ const mediaSections = computed(() => categories.map(category => {
   return { ...category, works: [...works.values()].sort((a, b) => a.number - b.number).map(work => ({ ...work, dateStyle: styleFor(category.type + '_' + work.number + '_date'), descriptionStyle: styleFor(category.type + '_' + work.number + '_description') })) };
 }).filter(category => category.type === 'broadcast' || category.works.some(work => work.gif || work.youtube)).map((category, index) => ({ ...category, number: String(index + 2).padStart(2, '0') })));
 
-const featuredGif = computed(() => mediaSections.value.flatMap(section => section.works).find(work => work.gif)?.gif || '');
+const featuredGif = computed(() => safeUrl(valueOf('FEATURED_WORK_GIF')));
 
 function artmugUrl(value) {
   try {
@@ -178,10 +178,11 @@ async function load() {
     await nextTick();
     const media = [...mediaSections.value.flatMap(section => section.works), ...collaborators.value];
     const firstGifs = [
+      featuredGif.value,
       ...mediaSections.value.map(section => section.works.find(work => work.gif)?.gif),
       ...collaborators.value.map(artist => artist.gif),
     ];
-    void preloader.preload(media.flatMap(work => [work.gif, ...(work.gifVariants || []).map(gif => gif.src)]), media.some(work => work.youtube), firstGifs);
+    void preloader.preload([featuredGif.value, ...media.flatMap(work => [work.gif, ...(work.gifVariants || []).map(gif => gif.src)])], media.some(work => work.youtube), firstGifs);
   }
   catch { error.value = "내용을 불러오지 못했습니다."; }
   finally { loading.value = false; }
