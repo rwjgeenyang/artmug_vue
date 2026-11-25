@@ -186,6 +186,15 @@ async function load() {
   catch { error.value = "내용을 불러오지 못했습니다."; }
   finally { loading.value = false; }
 }
+function scrollToSection(id) {
+  const target = document.getElementById(id);
+  if (!target) return;
+  target.scrollIntoView({
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    block: 'start',
+    inline: 'nearest',
+  });
+}
 onMounted(load);
 </script>
 
@@ -198,7 +207,6 @@ onMounted(load);
 
     <div class="studio-masthead">
       <span class="studio-wordmark">ANIMATION PORTFOLIO</span>
-      <nav aria-label="주요 안내"><a href="#pricing-heading">가격 안내</a><a href="#application-heading">신청양식</a></nav>
     </div>
     <section class="section studio-hero" aria-label="작가 소개">
       <p class="studio-kicker">SPINE 2D · COMMISSION</p>
@@ -209,12 +217,12 @@ onMounted(load);
           <h1 :style="styleFor('name')">{{ name }}</h1>
           <p v-if="job" class="job" :style="styleFor('job')">{{ job }}</p>
           <p class="intro-text" :style="styleFor(valueOf('intro') ? 'intro' : 'text')">{{ introduction }}</p>
-          <div class="studio-actions"><a class="studio-primary" href="#application-heading">커미션 신청양식</a><a href="#broadcast-heading">작업물 보기</a></div>
+          <div class="studio-actions"><a class="studio-primary" href="#application-heading" @click.prevent="scrollToSection('application-heading')">커미션 신청양식</a><a href="#broadcast-heading" @click.prevent="scrollToSection('broadcast-heading')">작업물 보기</a></div>
         </div>
       </div>
       <figure v-if="featuredGif" class="studio-featured">
         <img :src="featuredGif" :alt="name + ' 대표 작업 미리보기'" fetchpriority="high" />
-        <figcaption><span>FEATURED WORK</span><a href="#broadcast-heading">전체 작업물 보기</a></figcaption>
+        <figcaption><span>FEATURED WORK</span></figcaption>
       </figure>
     </section>
 
@@ -296,7 +304,7 @@ onMounted(load);
         </ul>
       </div>
     </section>
-    <footer class="studio-footer"><span>{{ name }}</span><span>SPINE 2D · ANIMATION PORTFOLIO</span><a href="#application-heading">신청양식 보기</a></footer>
+    <footer class="studio-footer"><span>{{ name }}</span><span>SPINE 2D · ANIMATION PORTFOLIO</span></footer>
   </main>
 </template>
 
