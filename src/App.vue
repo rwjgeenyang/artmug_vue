@@ -33,12 +33,12 @@ const styleFor = key => textStyle(valueOf, key);
 const pageStyle = computed(() => {
   const base = styleFor('text');
   return {
-    '--text-color': base.color || '#303238',
+    '--text-color': base.color || '#f0e8ec',
     '--text-size': base.fontSize || '18px',
     '--text-weight': '700',
-    '--accent-color': validColor(valueOf('accent_color')) || '#c93c4b',
-    '--accent-background': validColor(valueOf('accent_background')) || '#fff0f2',
-    '--accent-border': validColor(valueOf('accent_border')) || '#e77a87',
+    '--accent-color': validColor(valueOf('accent_color')) || '#ff8095',
+    '--accent-background': validColor(valueOf('accent_background')) || '#3b1c26',
+    '--accent-border': validColor(valueOf('accent_border')) || '#91354a',
   };
 });
 const processSteps = computed(() => {
@@ -59,7 +59,7 @@ const name = computed(() => loading.value ? '불러오는 중입니다...' : val
 const introduction = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("intro") || valueOf("text") || "작가 소개가 들어갈 공간입니다.");
 const about = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("about") || "소개글이 들어갈 공간입니다.");
 const notice = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("notice") || "주의사항이 들어갈 공간입니다.");
-const noticeLastColor = computed(() => validColor(valueOf('notice_last_color')) || '#c93c4b');
+const noticeLastColor = computed(() => validColor(valueOf('notice_last_color')) || '#ff8095');
 const noticeLines = computed(() => String(notice.value).split('^').map(line => line.trim().replace(/^[●•]\s*/, '')).filter(Boolean));
 const applicationFields = computed(() => {
   const rows = items.value.filter(item => /^form_[1-9]\d*_(title|description|placeholder)$/.test(item?.type || ''));
