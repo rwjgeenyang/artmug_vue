@@ -9,7 +9,7 @@
 .page.studio-design .studio-hero { padding: 48px 0 34px; }
 .studio-kicker { font-size: 13px; letter-spacing: .16em; color: var(--accent-color); margin-bottom: 24px; }
 .page.studio-design .introduction { align-items: flex-start; gap: 32px; padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
-.page.studio-design .profile-image, .page.studio-design .profile-placeholder { width: 140px; height: 140px; flex: 0 0 140px; border-radius: 28px; background: #251b20; border: 1px solid var(--studio-line); }
+.page.studio-design .profile-image, .page.studio-design .profile-placeholder { width: 140px; height: 140px; flex: 0 0 140px; border-radius: 50%; background: #251b20; border: 1px solid var(--studio-line); }
 .page.studio-design .profile-placeholder { font-size: 13px; }
 .page.studio-design .intro-copy { flex: 1; }
 .page.studio-design h1 { font-size: clamp(36px, 5.8vw, 56px); letter-spacing: -.055em; line-height: 1.2; color: var(--studio-ink); }
@@ -67,7 +67,7 @@
 .page.studio-design h2[id] { scroll-margin-top: 24px; }
 @media (max-width: 720px) {
   .page.studio-design { padding: 16px 20px 32px; }
-  .page.studio-design .profile-image, .page.studio-design .profile-placeholder { width: 100px; height: 100px; flex-basis: 100px; border-radius: 22px; }
+  .page.studio-design .profile-image, .page.studio-design .profile-placeholder { width: 100px; height: 100px; flex-basis: 100px; border-radius: 50%; }
   .page.studio-design .introduction { gap: 24px; }
   .page.studio-design .process-step { min-height: 130px; }
 }
