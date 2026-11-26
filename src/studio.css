@@ -14,7 +14,7 @@
 .page.studio-design .intro-copy { flex: 1; }
 .page.studio-design h1 { font-size: clamp(36px, 5.8vw, 56px); letter-spacing: -.055em; line-height: 1.2; color: var(--studio-ink); }
 .page.studio-design .job { margin-top: 12px; color: #bfb0b5; }
-.page.studio-design .intro-text { margin-top: 22px; line-height: 1.85; max-width: 36em; }
+.page.studio-design .intro-text { margin-top: 22px; line-height: 1.85; max-width: 45em; }
 .studio-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 28px; }
 .studio-actions a { padding: 13px 20px; border: 1px solid var(--studio-line); border-radius: 12px; font-size: 16px; }
 .studio-actions a.studio-primary { background: #a62b42; border-color: #c64760; color: #fff; }
