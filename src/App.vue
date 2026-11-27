@@ -9,15 +9,6 @@ import MediaCarousel from "./components/MediaCarousel.vue";
 import ApplicationForm from "./components/ApplicationForm.vue";
 import CollaboratorCard from "./components/CollaboratorCard.vue";
 
-const prices = [
-  { title: '비상업용', amount: '10만원' },
-  { title: '방송용', amount: '15만원' },
-  { title: '상업용', amount: '30만원' },
-  { title: '눈 깜빡임', amount: '2만원', note: '리뷰 작성 약속 시 무료!' },
-  { title: '추가 액팅', amount: '개당 5만원', note: '기본 IDLE 제외 추가 모션' },
-  { title: '반응형 월페이퍼', amount: '개당 6만원', note: '메모리얼, 터치, 볼 당기기 등' },
-  { title: '파츠 분리', amount: '시작가 15만원', note: '※ 그림의 복잡도에 따라 가격이 달라질 수 있습니다.' },
-];
 const items = ref([]);
 const loading = ref(true);
 const error = ref("");
@@ -30,6 +21,19 @@ const valuesByType = computed(() => {
 });
 const valueOf = type => valuesByType.value.get(type);
 const styleFor = key => textStyle(valueOf, key);
+const prices = computed(() => {
+  const numbers = new Set();
+  for (const item of items.value) {
+    const match = /^price_([1-9]\d*)_(desc|value)$/.exec(item?.type || '');
+    if (match) numbers.add(Number(match[1]));
+  }
+  return [...numbers].sort((a, b) => a - b).map(number => ({
+    number,
+    title: String(valueOf('price_' + number + '_desc') ?? '').trim(),
+    amount: String(valueOf('price_' + number + '_value') ?? '').trim(),
+  })).filter(price => price.title || price.amount);
+});
+
 const pageStyle = computed(() => {
   const base = styleFor('text');
   return {
@@ -271,10 +275,10 @@ onMounted(load);
         <table class="price-table" aria-labelledby="pricing-heading">
           <thead><tr><th scope="col">항목</th><th scope="col">가격</th></tr></thead>
           <tbody>
-            <tr v-for="price in prices" :key="price.title">
+            <tr v-if="!prices.length"><td colspan="2">{{ loading ? '불러오는 중입니다...' : '가격 안내를 준비 중입니다.' }}</td></tr>
+            <tr v-for="price in prices" :key="price.number">
               <th scope="row">
-                <span>{{ price.title }}</span>
-                <span v-if="price.note" class="price-note">{{ price.note }}</span>
+                <span class="price-description">{{ price.title }}</span>
               </th>
               <td>{{ price.amount }}</td>
             </tr>
@@ -300,6 +304,8 @@ onMounted(load);
 </template>
 
 <style>
+.price-description { white-space: pre-line; }
+
 .profile-image { width: 128px; height: 128px; flex: 0 0 128px; object-fit: contain; border-radius: 50%; background: #f8f9fa; }
 @media (max-width: 560px) { .profile-image { width: 96px; height: 96px; flex-basis: auto; } }
 
