@@ -1,6 +1,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import MediaFrame from './MediaFrame.vue';
+import SkeletonLines from './SkeletonLines.vue';
 
 const props = defineProps({ works: { type: Array, default: () => [] }, kind: String, label: String, pending: Boolean });
 const slides = computed(() => props.works.length ? props.works : [{ number: 1, gif: '', youtube: '', description: '' }]);
@@ -77,14 +78,15 @@ function keyboard(event) {
   <div class="carousel" role="region" aria-roledescription="슬라이더" :aria-label="label" tabindex="0" @keydown="keyboard">
     <div class="information-card work-description">
       <div class="work-description-row">
-      <p :style="{ fontSize: '18px', fontWeight: '700', ...current.descriptionStyle }">{{ pending ? '불러오는 중입니다...' : current.description || '작품 설명을 준비 중입니다···' }}</p>
+      <SkeletonLines v-if="pending" class="description-skeleton" :lines="2" />
+      <p v-else :style="{ fontSize: '18px', fontWeight: '700', ...current.descriptionStyle }">{{ current.description || '작품 설명을 준비 중입니다···' }}</p>
       <div v-if="kind === 'gif' && gifVariants.length" class="gif-variants" role="group" aria-label="인게임 모션 선택">
         <button v-for="gif in gifVariants" :key="gif.label" type="button"
           :aria-pressed="selectedGif?.label === gif.label"
           @click="selectedVariants[current.number] = gif.label">{{ gif.label }}</button>
       </div>
       </div>
-      <div v-if="displayDate" class="work-date" :style="{ fontSize: '18px', fontWeight: '700', ...current.dateStyle }">{{ displayDate }}</div>
+      <div v-if="!pending && displayDate" class="work-date" :style="{ fontSize: '18px', fontWeight: '700', ...current.dateStyle }">{{ displayDate }}</div>
     </div>
     <div class="carousel-surface" :class="{ dragging }" @pointerdown="down" @pointermove="drag" @pointerup="end($event)" @pointercancel="end($event, true)" @lostpointercapture="end($event, true)" @dragstart.prevent>
       <div ref="content" class="carousel-content" :style="{ transform: 'translateX(' + offset + 'px)' }">
@@ -100,6 +102,7 @@ function keyboard(event) {
 </template>
 
 <style scoped>
+.description-skeleton { flex: 1; }
 .work-description { display: flex; flex-direction: column; align-items: stretch; }
 .work-description-row { display: flex; align-items: flex-start; gap: 16px; }
 .work-description-row > p { flex: 1; min-width: 0; }

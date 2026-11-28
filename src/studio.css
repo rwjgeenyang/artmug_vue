@@ -8,7 +8,7 @@
 .studio-masthead a:hover, .studio-footer a:hover { color: var(--accent-color); }
 .page.studio-design .studio-hero { padding: 48px 0 34px; }
 .studio-kicker { font-size: 13px; letter-spacing: .16em; color: var(--accent-color); margin-bottom: 24px; }
-.page.studio-design .introduction { align-items: flex-start; gap: 32px; padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+.page.studio-design .introduction { align-items: center; gap: 32px; padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
 .page.studio-design .profile-image, .page.studio-design .profile-placeholder { width: 140px; height: 140px; flex: 0 0 140px; border-radius: 50%; background: #251b20; border: 1px solid var(--studio-line); }
 .page.studio-design .profile-placeholder { font-size: 13px; }
 .page.studio-design .intro-copy { flex: 1; }
@@ -111,3 +111,13 @@ html:has(.studio-design), body:has(.studio-design) { background: #121013; color-
 .page.studio-design .media-frame { background: #201a1e; }
 .page.studio-design .application-field textarea::placeholder { color: #a99ba1; }
 .page.studio-design .studio-about .information-card { background: #25191d; }
+
+/* Keep the mobile stack left-aligned; desktop portrait centers on all intro copy. */
+.page.studio-design .skeleton-avatar { background: #3d3d42; border-color: transparent; }
+.skeleton-name { width: min(65%, 320px); min-height: 64px; align-content: center; }
+.skeleton-revisions { width: min(100%, 240px); }
+.skeleton-footer { width: 140px; }
+@media (max-width: 560px) {
+  .page.studio-design .introduction { align-items: flex-start; }
+  .page.studio-design .intro-copy { width: 100%; }
+}

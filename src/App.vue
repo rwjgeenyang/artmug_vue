@@ -7,6 +7,7 @@ import { connectEmbedHeight } from "./services/embedHeight";
 import MediaCarousel from "./components/MediaCarousel.vue";
 import ApplicationForm from "./components/ApplicationForm.vue";
 import CollaboratorCard from "./components/CollaboratorCard.vue";
+import SkeletonLines from "./components/SkeletonLines.vue";
 
 const items = ref([]);
 const loading = ref(true);
@@ -21,15 +22,19 @@ const valuesByType = computed(() => {
 const valueOf = type => valuesByType.value.get(type);
 const styleFor = key => textStyle(valueOf, key);
 
-const prices = [
-  { title: '비상업용', amount: '13만원' },
-  { title: '방송용', amount: '18만원' },
-  { title: '상업용', amount: '33만원' },
-  { title: '눈 깜빡임', amount: '2만원', note: '리뷰 작성 약속 시 무료!' },
-  { title: '추가 액팅', amount: '개당 5만원', note: '기본 IDLE 제외 추가 모션' },
-  { title: '반응형 월페이퍼', amount: '개당 6만원', note: '메모리얼, 터치, 볼 당기기 등' },
-  { title: '파츠 분리', amount: '시작가 15만원', note: '※ 그림의 복잡도에 따라 가격이 달라질 수 있습니다.' },
-];
+const prices = computed(() => {
+  const numbers = new Set();
+  for (const item of items.value) {
+    const match = /^price_([1-9]\d*)_(desc|value|remark)$/.exec(item?.type || '');
+    if (match) numbers.add(Number(match[1]));
+  }
+  return [...numbers].sort((a, b) => a - b).map(number => ({
+    number,
+    title: String(valueOf('price_' + number + '_desc') ?? '').trim(),
+    amount: String(valueOf('price_' + number + '_value') ?? '').trim(),
+    note: String(valueOf('price_' + number + '_remark') ?? '').trim(),
+  })).filter(price => price.title || price.amount);
+});
 
 const pageStyle = computed(() => {
   const base = styleFor('text');
@@ -55,11 +60,11 @@ const processSteps = computed(() => {
   }
   return [...steps.values()].sort((a, b) => a.number - b.number);
 });
-const processRevisions = computed(() => loading.value ? '불러오는 중입니다...' : valueOf('process_revisions') || '수정 횟수를 입력해 주세요.');
-const name = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("name") || "작가 이름");
-const introduction = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("intro") || valueOf("text") || "작가 소개가 들어갈 공간입니다.");
-const about = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("about") || "소개글이 들어갈 공간입니다.");
-const notice = computed(() => loading.value ? '불러오는 중입니다...' : valueOf("notice") || "주의사항이 들어갈 공간입니다.");
+const processRevisions = computed(() => valueOf('process_revisions') || '수정 횟수를 입력해 주세요.');
+const name = computed(() => valueOf("name") || "작가 이름");
+const introduction = computed(() => valueOf("intro") || valueOf("text") || "작가 소개가 들어갈 공간입니다.");
+const about = computed(() => valueOf("about") || "소개글이 들어갈 공간입니다.");
+const notice = computed(() => valueOf("notice") || "주의사항이 들어갈 공간입니다.");
 const noticeLastColor = computed(() => validColor(valueOf('notice_last_color')) || '#ff8095');
 const noticeLines = computed(() => String(notice.value).split('^').map(line => line.trim().replace(/^[●•]\s*/, '')).filter(Boolean));
 const applicationFields = computed(() => {
@@ -183,7 +188,6 @@ onMounted(load);
 
 <template>
   <main class="page studio-design" ref="pageElement" :style="pageStyle">
-    <p v-if="loading" class="status" role="status">불러오는 중입니다...</p>
     <div v-if="error" class="status" role="alert">
       {{ error }} <button type="button" @click="load">다시 불러오기</button>
     </div>
@@ -194,12 +198,20 @@ onMounted(load);
     <section class="section studio-hero" aria-label="작가 소개">
       <p class="studio-kicker">SPINE 2D · COMMISSION</p>
       <div class="introduction">
-        <img v-if="profileImage && !profileFailed" class="profile-image" :src="profileImage" :alt="name + ' 프로필'" @error="profileFailed = true" />
+        <div v-if="loading" class="profile-placeholder skeleton-avatar" aria-hidden="true"></div>
+        <img v-else-if="profileImage && !profileFailed" class="profile-image" :src="profileImage" :alt="name + ' 프로필'" @error="profileFailed = true" />
         <div v-else class="profile-placeholder" aria-label="프로필 이미지 자리">PROFILE</div>
         <div class="intro-copy">
+          <template v-if="loading">
+            <SkeletonLines class="skeleton-name" :lines="1" />
+            <SkeletonLines class="job" :lines="1" />
+            <SkeletonLines class="intro-text" :lines="2" />
+          </template>
+          <template v-else>
           <h1 :style="styleFor('name')">{{ name }}</h1>
           <p v-if="job" class="job" :style="styleFor('job')">{{ job }}</p>
           <p class="intro-text" :style="styleFor(valueOf('intro') ? 'intro' : 'text')">{{ introduction }}</p>
+          </template>
         </div>
       </div>
       <figure v-if="featuredGif" class="studio-featured">
@@ -209,13 +221,16 @@ onMounted(load);
     </section>
 
     <section class="section studio-about" aria-label="소개글">
-      <div class="information-card"><p :style="styleFor('about')">{{ about }}</p></div>
+      <div class="information-card"><SkeletonLines v-if="loading" /><p v-else :style="styleFor('about')">{{ about }}</p></div>
     </section>
 
     <section class="section studio-process" aria-labelledby="process-heading">
       <header class="section-heading"><span class="number">01</span><h2 id="process-heading">작업 진행 방식</h2></header>
       <div class="information-card process-card">
-        <ol v-if="processSteps.length" class="process-steps" :class="{ 'many-steps': processSteps.length > 6 }" :style="{ '--step-count': processSteps.length }">
+        <div v-if="loading" class="process-steps" style="--step-count: 5" aria-busy="true">
+          <div v-for="step in 5" :key="step" class="process-step"><SkeletonLines :lines="2" /></div>
+        </div>
+        <ol v-else-if="processSteps.length" class="process-steps" :class="{ 'many-steps': processSteps.length > 6 }" :style="{ '--step-count': processSteps.length }">
           <li v-for="step in processSteps" :key="step.number" class="process-step">
             <span class="step-number">STEP {{ String(step.number).padStart(2, '0') }}</span>
             <div class="step-content">
@@ -224,10 +239,11 @@ onMounted(load);
             </div>
           </li>
         </ol>
-        <p v-else>{{ loading ? '불러오는 중입니다...' : '작업 진행 방식을 준비 중입니다···' }}</p>
+        <p v-else>작업 진행 방식을 준비 중입니다···</p>
         <div class="revision-summary">
           <span class="revision-label">수정 횟수</span>
-          <p :style="{ fontWeight: '700', ...styleFor('process_revisions') }">{{ processRevisions }}</p>
+          <SkeletonLines v-if="loading" class="skeleton-revisions" :lines="1" />
+          <p v-else :style="{ fontWeight: '700', ...styleFor('process_revisions') }">{{ processRevisions }}</p>
         </div>
       </div>
     </section>
@@ -251,7 +267,7 @@ onMounted(load);
     </section>
     <section class="section" aria-labelledby="collaborators-heading">
       <header class="section-heading"><span class="number">{{ String(mediaSections.length + 2).padStart(2, '0') }}</span><h2 id="collaborators-heading">협업작가</h2></header>
-      <div v-if="loading" class="information-card" role="status">불러오는 중입니다...</div>
+      <div v-if="loading" class="information-card"><SkeletonLines /></div>
       <div v-else class="collaborators-list">
         <CollaboratorCard v-for="artist in collaborators" :key="artist.id" :artist="artist" />
       </div>
@@ -262,37 +278,43 @@ onMounted(load);
         <table class="price-table" aria-labelledby="pricing-heading">
           <thead><tr><th scope="col">항목</th><th scope="col">가격</th></tr></thead>
           <tbody>
-            <tr v-if="!prices.length"><td colspan="2">{{ loading ? '불러오는 중입니다...' : '가격 안내를 준비 중입니다.' }}</td></tr>
-            <tr v-for="price in prices" :key="price.title">
+            <template v-if="loading">
+              <tr v-for="row in 3" :key="row"><td><SkeletonLines :lines="2" /></td><td><SkeletonLines :lines="1" /></td></tr>
+            </template>
+            <tr v-else-if="!prices.length"><td colspan="2">가격 안내를 준비 중입니다.</td></tr>
+            <template v-else>
+            <tr v-for="price in prices" :key="price.number">
               <th scope="row">
                 <span class="price-description">{{ price.title }}</span>
                 <span v-if="price.note" class="price-note">{{ price.note }}</span>
               </th>
               <td>{{ price.amount }}</td>
             </tr>
+            </template>
           </tbody>
         </table>
       </div>
     </section>
     <section class="section" aria-labelledby="application-heading">
       <header class="section-heading"><span class="number">{{ String(mediaSections.length + 4).padStart(2, '0') }}</span><h2 id="application-heading">신청양식</h2></header>
-      <div v-if="loading" class="information-card" role="status">불러오는 중입니다...</div>
+      <div v-if="loading" class="information-card"><SkeletonLines /></div>
       <ApplicationForm v-else :fields="applicationFields" />
     </section>
     <section class="section" aria-labelledby="notice-heading">
       <header class="section-heading"><span class="number">{{ String(mediaSections.length + 5).padStart(2, '0') }}</span><h2 id="notice-heading">주의사항</h2></header>
       <div class="information-card">
-        <ul class="notice-list" :style="{ fontSize: '18px', ...styleFor('notice') }">
+        <SkeletonLines v-if="loading" />
+        <ul v-else class="notice-list" :style="{ fontSize: '18px', ...styleFor('notice') }">
           <li v-for="(line, index) in noticeLines" :key="index" :style="index === noticeLines.length - 1 ? { color: noticeLastColor } : undefined"><span class="notice-bullet" aria-hidden="true">●</span><span>{{ line }}</span></li>
         </ul>
       </div>
     </section>
-    <footer class="studio-footer"><span>{{ name }}</span><span>SPINE 2D · ANIMATION PORTFOLIO</span></footer>
+    <footer class="studio-footer"><SkeletonLines v-if="loading" class="skeleton-footer" :lines="1" /><span v-else>{{ name }}</span><span>SPINE 2D · ANIMATION PORTFOLIO</span></footer>
   </main>
 </template>
 
 <style>
-.price-description { white-space: pre-line; }
+.price-description, .price-note { white-space: pre-line; }
 
 .profile-image { width: 128px; height: 128px; flex: 0 0 128px; object-fit: contain; border-radius: 50%; background: #f8f9fa; }
 @media (max-width: 560px) { .profile-image { width: 96px; height: 96px; flex-basis: auto; } }

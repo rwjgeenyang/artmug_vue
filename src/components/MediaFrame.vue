@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue';
+import SkeletonLines from './SkeletonLines.vue';
 
 const props = defineProps({ src: String, kind: String, label: String, lazy: Boolean, pending: Boolean });
 // Keep the last loaded GIF's proportions until the next image has dimensions.
@@ -28,11 +29,11 @@ function errored(event) {
 <template>
   <div class="media-frame"
     :style="{ aspectRatio: kind === 'youtube' ? 16 / 9 : ratio }" :aria-busy="pending || loading">
-    <p v-if="pending" class="media-message" role="status">불러오는 중입니다...</p>
+    <SkeletonLines v-if="pending" class="media-skeleton" :lines="2" />
     <p v-else-if="!src" class="media-message">준비 중입니다···</p>
     <p v-else-if="failed" class="media-message">미디어를 불러오지 못했습니다.</p>
     <template v-else>
-      <p v-if="loading" class="media-message" role="status">불러오는 중입니다...</p>
+      <SkeletonLines v-if="loading" class="media-skeleton" :lines="2" />
       <img v-if="kind === 'gif'" :key="src" :src="src" :alt="label"
         :class="{ pending: loading }" :loading="lazy ? 'lazy' : 'eager'"
         draggable="false" @load="loaded" @error="errored" />
@@ -44,6 +45,7 @@ function errored(event) {
 </template>
 
 <style scoped>
+.media-skeleton { width: min(60%, 320px); }
 .media-frame { width: 100%; position: relative; display: grid; place-items: center; overflow: hidden; border-radius: 18px; background: #f5f6f8; }
 .media-frame::after { content: ""; position: absolute; inset: 0; border: 1px solid #000; border-radius: inherit; pointer-events: none; z-index: 1; }
 .media-message { margin: 0; padding: 24px; color: #747982; font-size: 13px; text-align: center; }
