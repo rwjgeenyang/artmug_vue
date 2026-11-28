@@ -1,8 +1,7 @@
 <script setup>
 import "./studio.css";
-import { computed, onMounted, onBeforeUnmount, nextTick, ref } from "vue";
+import { computed, onMounted, onBeforeUnmount, ref } from "vue";
 import { textStyle, validColor } from "./services/textStyle";
-import { createMediaPreloader } from "./services/mediaPreload";
 import { getPageData } from "./services/sheetApi";
 import { connectEmbedHeight } from "./services/embedHeight";
 import MediaCarousel from "./components/MediaCarousel.vue";
@@ -164,8 +163,6 @@ const collaborators = computed(() => {
   return artists.length ? artists : [{ id: 'placeholder', name: '협업작가 이름', intro: '', url: '', gif: '', youtube: '', note: '' }];
 });
 
-const preloader = createMediaPreloader();
-onBeforeUnmount(() => preloader.dispose());
 const pageElement = ref(null);
 let disconnectEmbed = () => {};
 onMounted(() => { disconnectEmbed = connectEmbedHeight(pageElement.value); });
@@ -176,15 +173,7 @@ async function load() {
   error.value = "";
   try {
     items.value = await getPageData();
-    // Prioritize the first GIF of each category and each collaborator card.
-    await nextTick();
-    const media = [...mediaSections.value.flatMap(section => section.works), ...collaborators.value];
-    const firstGifs = [
-      featuredGif.value,
-      ...mediaSections.value.map(section => section.works.find(work => work.gif)?.gif),
-      ...collaborators.value.map(artist => artist.gif),
-    ];
-    void preloader.preload([featuredGif.value, ...media.flatMap(work => [work.gif, ...(work.gifVariants || []).map(gif => gif.src)])], media.some(work => work.youtube), firstGifs);
+    // MediaCarousel renders only its selected slide; other GIFs load on selection.
   }
   catch { error.value = "내용을 불러오지 못했습니다."; }
   finally { loading.value = false; }
